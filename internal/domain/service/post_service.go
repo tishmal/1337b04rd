@@ -1,5 +1,10 @@
 package service
 
+import (
+	"1337B04RD/internal/domain/entity"
+	"1337B04RD/internal/domain/port"
+)
+
 // internal/domain/service/post_service.go
 type PostService struct {
 	postRepo     port.PostRepository
