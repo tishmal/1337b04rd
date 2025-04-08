@@ -10,4 +10,10 @@ func NewRickMortyAPI(baseURL string) *RickMortyAPI {
 	// Инициализация API клиента
 }
 
+type Character struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	// Добавьте другие поля, которые вам нужны для персонажа
+}
+
 // Реализация методов AvatarService
