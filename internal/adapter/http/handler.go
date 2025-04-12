@@ -25,3 +25,4 @@ func (h *Handler) CatalogHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Другие обработчики
+
