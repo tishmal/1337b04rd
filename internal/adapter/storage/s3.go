@@ -65,4 +65,18 @@ func NewS3Storage(endpoint, accessKey, secretKey string, useSSL bool, postBucket
 	return s3, nil
 }
 
-// Реализация методов ImageStorage
+// Реализация интерфейса port.ImageStorage
+func (s *S3Storage) Upload(data []byte, filename string) (string, error) {
+	// ...
+	return "", fmt.Errorf("")
+}
+
+func (s *S3Storage) Get(filename string) ([]byte, error) {
+	// ...
+	return nil, fmt.Errorf("")
+}
+
+func (s *S3Storage) Delete(filename string) error {
+	// ...
+	return fmt.Errorf("")
+}

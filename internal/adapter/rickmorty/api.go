@@ -8,6 +8,8 @@ type RickMortyAPI struct {
 
 func NewRickMortyAPI(baseURL string) *RickMortyAPI {
 	// Инициализация API клиента
+	return &RickMortyAPI{}
+	// заглушка
 }
 
 type Character struct {

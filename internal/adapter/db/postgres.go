@@ -1,6 +1,7 @@
 package db
 
 import (
+	"1337B04RD/internal/domain/entity"
 	"database/sql"
 )
 
@@ -13,3 +14,10 @@ func NewPostgresRepository(_db *sql.DB) *PostgresRepository {
 }
 
 // Реализация методов PostRepository, CommentRepository, SessionRepository
+
+// Реализация интерфейса PostRepository
+func (p *PostgresRepository) Create(post *entity.Post) error {
+	// реализация
+	var err error
+	return err
+}
