@@ -1,6 +1,6 @@
 module 1337B04RD
 
-go 1.23
+go 1.23.0
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -9,12 +9,13 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
+	github.com/lib/pq v1.10.9 // indirect
 	github.com/minio/crc64nvme v1.0.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.89 // indirect
+	github.com/minio/minio-go/v7 v7.0.90 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	golang.org/x/crypto v0.36.0 // indirect
-	golang.org/x/net v0.37.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 )

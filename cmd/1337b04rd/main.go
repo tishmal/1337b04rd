@@ -5,7 +5,6 @@ import (
 	"os"
 )
 
-// cmd/1337b04rd/main.go
 func main() {
 	// Парсинг аргументов командной строки
 
@@ -13,9 +12,9 @@ func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
 	// Инициализация адаптеров
-	db := initDatabase()
-	s3 := initS3Storage()
-	rickMortyAPI := initRickMortyAPI()
+	db := initDatabase(logger)
+	s3 := initS3Storage(logger)
+	// rickMortyAPI := initRickMortyAPI()
 
 	// Инициализация репозиториев
 	postRepo := db.NewPostRepository()

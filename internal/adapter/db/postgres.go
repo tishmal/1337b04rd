@@ -4,7 +4,6 @@ import (
 	"database/sql"
 )
 
-// internal/adapter/db/postgres.go
 type PostgresRepository struct {
 	db *sql.DB
 }
