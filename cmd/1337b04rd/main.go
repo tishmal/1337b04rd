@@ -1,13 +1,14 @@
 package cmd
 
 import (
+	adapter_http "1337B04RD/internal/adapter/http"
 	"1337B04RD/internal/domain/port"
 	"1337B04RD/internal/domain/service"
 	"1337B04RD/utils"
 	"flag"
 	"fmt"
-	"http"
 	"log/slog"
+	"net/http"
 	"os"
 )
 
@@ -40,11 +41,10 @@ func main() {
 	// sessionService := service.NewSessionService(sessionRepo, rickMortyAPI)
 
 	// Инициализация обработчиков
-	// handler := http.NewHandler(postService, sessionService)
-	handler := http.NewHandler(postService)
+	handler := adapter_http.NewHandler(postService)
+	//handler := adapter_http.NewHandler(postService, sessionService)
 	// Настройка маршрутизации
-	router := http.NewServeMux()
-	router.HandleFunc("/", handler.CatalogHandler)
+	router := adapter_http.SetupRoutes(handler)
 	// Другие маршруты
 
 	addr := fmt.Sprintf(":%d", *portS)
