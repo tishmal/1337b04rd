@@ -6,8 +6,8 @@ CREATE TABLE posts (
     user_id VARCHAR(36) NOT NULL,
     user_name VARCHAR(255) NOT NULL,
     avatar_url VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
     is_archived BOOLEAN NOT NULL DEFAULT FALSE
 );
 
@@ -19,7 +19,7 @@ CREATE TABLE comments (
     user_id VARCHAR(36) NOT NULL,
     user_name VARCHAR(255) NOT NULL,
     avatar_url VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP NOT NULL
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE sessions (
@@ -27,5 +27,5 @@ CREATE TABLE sessions (
     user_id VARCHAR(36) NOT NULL,
     user_name VARCHAR(255) NOT NULL,
     avatar_url VARCHAR(255) NOT NULL,
-    expires_at TIMESTAMP NOT NULL
+    expires_at TIMESTAMP DEFAULT NOW()
 );
