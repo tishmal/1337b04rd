@@ -68,7 +68,7 @@ func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	sessionID := "some-session"
 
 	// Создание поста
-	post, err := h.postService.CreatePost(title, content, sessionID)
+	post, err := h.postService.CreatePost(r.Context(), title, content, sessionID)
 	if err != nil {
 		http.Error(w, "Failed to create post", http.StatusInternalServerError)
 		return

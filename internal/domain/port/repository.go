@@ -1,9 +1,12 @@
 package port
 
-import "1337B04RD/internal/domain/entity"
+import (
+	"1337B04RD/internal/domain/entity"
+	"context"
+)
 
 type PostRepository interface {
-	Create(post *entity.Post) error
+	Create(ctx context.Context, post *entity.Post) (*entity.Post, error)
 	// Get(id string) (*entity.Post, error)
 	// GetAll() ([]*entity.Post, error)
 	// GetArchived() ([]*entity.Post, error)

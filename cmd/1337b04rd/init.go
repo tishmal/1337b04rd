@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	dbadapter "1337B04RD/internal/adapter/db"

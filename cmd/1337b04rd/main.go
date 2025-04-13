@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	adapter_http "1337B04RD/internal/adapter/http"
