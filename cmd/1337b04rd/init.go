@@ -1,12 +1,14 @@
 package main
 
 import (
-	dbadapter "1337B04RD/internal/adapter/db"
-	storageS3 "1337B04RD/internal/adapter/storage"
 	"database/sql"
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
+
+	dbadapter "1337B04RD/internal/adapter/db"
+	storageS3 "1337B04RD/internal/adapter/storage"
 
 	_ "github.com/lib/pq"
 )
@@ -44,6 +46,12 @@ func initDatabase(logger *slog.Logger) *dbadapter.PostgresRepository {
 
 func initS3Storage(logger *slog.Logger) *storageS3.S3Storage {
 	endpoint := getEnv("S3_ENDPOINT", "localhost:9000")
+
+	// Добавляем протокол, если его нет
+	if !strings.HasPrefix(endpoint, "http://") && !strings.HasPrefix(endpoint, "https://") {
+		endpoint = "http://" + endpoint
+	}
+
 	accessKey := getEnv("S3_ACCESS_KEY", "minioadmin")
 	secretKey := getEnv("S3_SECRET_KEY", "minioadmin")
 	useSSL := getEnv("S3_USE_SSL", "false") == "true"

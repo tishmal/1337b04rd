@@ -1,25 +1,42 @@
-# Stage 1: Build
-FROM golang:1.23 AS builder
+# Stage 1: Build the application
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+# Install required packages
+RUN apk add --no-cache git make
+
+# Copy go module files first for better layer caching
+COPY go.mod go.sum* ./
 RUN go mod download
 
-COPY . ./
+# Copy the source code
+COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o 1337b04rd ./cmd/1337b04rd
+# Build the application
+RUN go build -o 1337b04rd ./cmd/1337b04rd
 
-# Stage 2: Runtime
-FROM alpine:latest
-
-RUN apk add --no-cache ca-certificates
+# Stage 2: Runtime image
+FROM alpine:3.19
 
 WORKDIR /app
 
-COPY --from=builder /app/1337b04rd .
+# Install runtime dependencies
+RUN apk add --no-cache ca-certificates tzdata
 
-RUN chmod +x /app/1337b04rd
+# Copy the binary from the builder stage
+COPY --from=builder /app/1337b04rd /app/
+COPY web/ /app/web/
+# COPY static/ /app/static/
 
-# Применяем миграции при старте контейнера
-CMD ./migrate -path /app/migrations -database "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" up && ./1337b04rd
+# Create a non-root user
+RUN adduser -D -g '' appuser
+RUN chown -R appuser:appuser /app
+USER appuser
+
+# Expose the application port
+EXPOSE 8080
+
+# Command to run the application
+ENTRYPOINT ["/app/1337b04rd"]
+CMD ["--port", "8080"]

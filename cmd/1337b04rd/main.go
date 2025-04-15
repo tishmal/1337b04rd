@@ -1,15 +1,20 @@
 package main
 
 import (
-	adapter_http "1337B04RD/internal/adapter/http"
-	"1337B04RD/internal/domain/port"
-	"1337B04RD/internal/domain/service"
-	"1337B04RD/utils"
 	"flag"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
+
+	"1337B04RD/internal/adapter/db"
+	adapter_http "1337B04RD/internal/adapter/http"
+	"1337B04RD/internal/domain/port"
+	"1337B04RD/internal/domain/service"
+	"1337B04RD/utils"
+
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -26,9 +31,19 @@ func main() {
 	// Инициализация логгера
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	// Инициализация адаптеров
+	// Инициализация адаптеров (используем функции из init.go)
 	dbAdapter := initDatabase(logger)
 	s3 := initS3Storage(logger)
+
+	// Запуск миграций, если AUTO_MIGRATE=true
+	if shouldRunMigrations() {
+		if err := db.RunMigrations(dbAdapter.GetDB(), logger); err != nil {
+			logger.Error("Failed to run migrations", "error", err)
+			os.Exit(1)
+		}
+		logger.Info("Migrations completed successfully")
+	}
+
 	// rickMortyAPI := initRickMortyAPI()
 
 	// Инициализация репозиториев
@@ -42,17 +57,36 @@ func main() {
 
 	// Инициализация обработчиков
 	handler := adapter_http.NewHandler(postService)
-	//handler := adapter_http.NewHandler(postService, sessionService)
+	// handler := adapter_http.NewHandler(postService, sessionService)
+
 	// Настройка маршрутизации
 	router := adapter_http.SetupRoutes(handler)
-	// Другие маршруты
 
-	addr := fmt.Sprintf(":%d", *portS)
 	// Запуск сервера
+	addr := fmt.Sprintf(":%d", *portS)
 	logger.Info("Starting server on port " + addr)
-	err := http.ListenAndServe(":"+addr, router)
+	err := http.ListenAndServe(addr, router)
 	if err != nil {
 		logger.Error("Failed to start server", "error", err)
 		os.Exit(1)
 	}
+}
+
+// shouldRunMigrations проверяет, нужно ли запускать миграции
+func shouldRunMigrations() bool {
+	return getEnvAsBool("AUTO_MIGRATE", true)
+}
+
+// getEnvAsBool получает булеву переменную окружения или возвращает значение по умолчанию
+func getEnvAsBool(key string, defaultValue bool) bool {
+	value, exists := os.LookupEnv(key)
+	if !exists {
+		return defaultValue
+	}
+
+	boolValue, err := strconv.ParseBool(value)
+	if err != nil {
+		return defaultValue
+	}
+	return boolValue
 }
