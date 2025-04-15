@@ -24,9 +24,11 @@ WORKDIR /app
 # Install runtime dependencies
 RUN apk add --no-cache ca-certificates tzdata
 
-# Copy the binary from the builder stage
+# Copy the binary and required files from the builder stage
 COPY --from=builder /app/1337b04rd /app/
+
 COPY web/ /app/web/
+
 # COPY static/ /app/static/
 
 # Create a non-root user

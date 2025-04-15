@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strings"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -18,7 +19,10 @@ type S3Storage struct {
 
 func NewS3Storage(endpoint, accessKey, secretKey string, useSSL bool, postBucket, commentBucket string, logger *slog.Logger) (*S3Storage, error) {
 	// Инициализация клиента MinIO
-	client, err := minio.New(endpoint, &minio.Options{
+	parsedEndpoint := strings.TrimPrefix(endpoint, "http://")
+	parsedEndpoint = strings.TrimPrefix(parsedEndpoint, "https://")
+
+	client, err := minio.New(parsedEndpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
 		Secure: useSSL,
 	})

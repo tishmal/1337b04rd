@@ -27,6 +27,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./logs:/app/logs
 
   postgres:
