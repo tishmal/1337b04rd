@@ -51,7 +51,7 @@ func main() {
 	addr := fmt.Sprintf(":%d", *portS)
 	// Запуск сервера
 	logger.Info("Starting server on port " + addr)
-	err := http.ListenAndServe(":"+addr, router)
+	err := http.ListenAndServe(addr, router)
 	if err != nil {
 		logger.Error("Failed to start server", "error", err)
 		os.Exit(1)

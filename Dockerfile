@@ -27,7 +27,7 @@ RUN apk add --no-cache ca-certificates tzdata
 # Copy the binary and required files from the builder stage
 COPY --from=builder /app/1337b04rd /app/
 
-COPY web/ /app/web/
+COPY web/static/templates/ /app/web/static/templates/
 
 # COPY static/ /app/static/
 

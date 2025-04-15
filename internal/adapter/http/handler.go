@@ -1,9 +1,10 @@
 package http
 
 import (
-	"1337B04RD/internal/domain/service"
 	"net/http"
 	"text/template"
+
+	"1337B04RD/internal/domain/service"
 )
 
 // internal/adapter/http/handler.go
@@ -16,7 +17,7 @@ type Handler struct {
 // NewHandler(postService *service.PostService, sessionService *service.SessionService)
 func NewHandler(postService *service.PostService) *Handler {
 	// Загрузка шаблонов
-	templates := template.Must(template.ParseGlob("web/templates/*.html"))
+	templates := template.Must(template.ParseGlob("web/static/templates/*.html"))
 	return &Handler{postService, templates}
 	// return &Handler{postService, sessionService, templates}
 }
@@ -44,7 +45,7 @@ func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	content := r.FormValue("content")
 	file, fileHeader, err := r.FormFile("image")
 
-	//var imageURL string
+	// var imageURL string
 	if err == nil {
 		defer file.Close()
 
