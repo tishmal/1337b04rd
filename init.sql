@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     user_name VARCHAR(255),
     custom_name VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    expires_at TIMESTAMP WITH TIME ZONE NULL,
     CONSTRAINT sessions_session_id_key UNIQUE (session_id)
 );
 
