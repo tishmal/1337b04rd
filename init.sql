@@ -1,9 +1,9 @@
 -- migrations/000001_init_schema.up.sql
 CREATE TABLE IF NOT EXISTS sessions (
     id SERIAL PRIMARY KEY,
-    session_id VARCHAR(255) NOT NULL UNIQUE,
-    user_avatar_id INT NOT NULL,
-    user_name VARCHAR(255) NOT NULL,
+    session_id VARCHAR(255) UNIQUE,
+    user_avatar_id INT,
+    user_name VARCHAR(255),
     custom_name VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS posts (
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     image_path VARCHAR(255),
-    session_id VARCHAR(255) NOT NULL,
-    user_avatar_id INT NOT NULL,
+    session_id VARCHAR(255),
+    user_avatar_id INT,
     user_name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_activity TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -28,14 +28,14 @@ CREATE TABLE IF NOT EXISTS posts (
 
 CREATE TABLE IF NOT EXISTS comments (
     id SERIAL PRIMARY KEY,
-    comment_id VARCHAR(50) NOT NULL UNIQUE,  -- Уменьшен размер
-    post_id VARCHAR(50) NOT NULL,  -- Уменьшен размер
+    comment_id VARCHAR(50) UNIQUE,  -- Уменьшен размер
+    post_id VARCHAR(50),  -- Уменьшен размер
     parent_id VARCHAR(50),
     content TEXT NOT NULL,
     image_path VARCHAR(255),
-    session_id VARCHAR(255) NOT NULL,
-    user_avatar_id INT NOT NULL,
-    user_name VARCHAR(255) NOT NULL,
+    session_id VARCHAR(255),
+    user_avatar_id INT,
+    user_name VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT comments_comment_id_key UNIQUE (comment_id),
     CONSTRAINT fk_post FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,

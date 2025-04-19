@@ -27,14 +27,23 @@ func (r *PostgresRepository) GetDB() *sql.DB {
 
 // Реализация интерфейса PostRepository
 func (r *PostgresRepository) Create(ctx context.Context, post *entity.Post) (*entity.Post, error) {
-	query := `INSERT INTO posts (id, title, content)
-          VALUES ($1, $2, $3)
-          RETURNING id, title, content, created_at`
+	query := `INSERT INTO posts (post_id, title, content, user_avatar_id, session_id, user_name)
+	          VALUES ($1, $2, $3, $4, $5, $6)
+	          RETURNING id, post_id, title, content, user_avatar_id, user_name, session_id, created_at`
 
-	row := r.db.QueryRowContext(ctx, query, post.ID, post.Title, post.Content)
-	err := row.Scan(&post.ID, &post.Title, &post.Content, &post.CreatedAt)
+	row := r.db.QueryRowContext(ctx, query,
+		post.PostID,
+		post.Title,
+		post.Content,
+		post.UserAvatarID,
+		post.SessionID,
+		post.UserName,
+	)
+
+	err := row.Scan(&post.ID, &post.PostID, &post.Title, &post.Content, &post.UserAvatarID, &post.UserName, &post.SessionID, &post.CreatedAt)
 	if err != nil {
-		return &entity.Post{}, err
+		return nil, err
 	}
+
 	return post, nil
 }

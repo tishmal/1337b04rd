@@ -38,7 +38,7 @@ func main() {
 	// var sessionRepo port.SessionRepository = dbAdapter
 
 	// Инициализация сервисов
-	postService := service.NewPostService(postRepo, commentRepo, s3)
+	postService := service.NewPostService(postRepo, commentRepo, s3, logger)
 	// sessionService := service.NewSessionService(sessionRepo, rickMortyAPI)
 
 	// Инициализация обработчиков
@@ -50,7 +50,7 @@ func main() {
 
 	addr := fmt.Sprintf(":%d", *portS)
 	// Запуск сервера
-	logger.Info("Starting server on port " + addr)
+	logger.Info("🚀Starting server on port " + addr)
 	err := http.ListenAndServe(addr, router)
 	if err != nil {
 		logger.Error("Failed to start server", "error", err)

@@ -3,13 +3,15 @@ package entity
 import "time"
 
 type Post struct {
-	ID        string
-	Title     string
-	Content   string
-	ImageURL  string
-	UserID    string
-	UserName  string
-	AvatarURL string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID           string
+	PostID       string
+	Title        string
+	Content      string
+	SessionID    string
+	ImageURL     string
+	UserAvatarID int
+	UserName     string
+	AvatarURL    string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }

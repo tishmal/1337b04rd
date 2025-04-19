@@ -22,9 +22,8 @@ func NewHandler(postService *service.PostService) *Handler {
 	// return &Handler{postService, sessionService, templates}
 }
 
-// Обработчики для различных эндпоинтов
 func (h *Handler) CatalogHandler(w http.ResponseWriter, r *http.Request) {
-	// Логика обработки запроса к каталогу
+	http.Redirect(w, r, "/static/catalog.html", http.StatusSeeOther)
 }
 
 // Другие обработчики
@@ -41,9 +40,10 @@ func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	title := r.FormValue("title")
-	content := r.FormValue("content")
-	file, fileHeader, err := r.FormFile("image")
+	userName := r.FormValue("name")
+	title := r.FormValue("subject")
+	content := r.FormValue("comment")
+	file, fileHeader, err := r.FormFile("file")
 
 	// var imageURL string
 	if err == nil {
@@ -69,7 +69,7 @@ func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	sessionID := "some-session"
 
 	// Создание поста
-	post, err := h.postService.CreatePost(r.Context(), title, content, sessionID)
+	post, err := h.postService.CreatePost(r.Context(), userName, title, content, sessionID)
 	if err != nil {
 		http.Error(w, "Failed to create post", http.StatusInternalServerError)
 		return
