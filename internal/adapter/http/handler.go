@@ -9,17 +9,15 @@ import (
 
 // internal/adapter/http/handler.go
 type Handler struct {
-	postService *service.PostService
-	// sessionService *service.SessionService
-	templates *template.Template
+	postService    *service.PostService
+	sessionService *service.SessionService
+	templates      *template.Template
 }
 
-// NewHandler(postService *service.PostService, sessionService *service.SessionService)
-func NewHandler(postService *service.PostService) *Handler {
+func NewHandler(postService *service.PostService, sessionService *service.SessionService) *Handler {
 	// Загрузка шаблонов
 	templates := template.Must(template.ParseGlob("web/static/templates/*.html"))
-	return &Handler{postService, templates}
-	// return &Handler{postService, sessionService, templates}
+	return &Handler{postService, sessionService, templates}
 }
 
 func (h *Handler) CatalogHandler(w http.ResponseWriter, r *http.Request) {

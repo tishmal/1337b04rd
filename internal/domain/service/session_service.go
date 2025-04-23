@@ -1,11 +1,37 @@
 package service
 
-import "1337B04RD/internal/domain/port"
+import (
+	"1337B04RD/internal/domain/entity"
+	"1337B04RD/internal/domain/port"
+	"1337B04RD/internal/utils"
+	"time"
+)
 
-// internal/domain/service/session_service.go
 type SessionService struct {
-	sessionRepo   port.SessionRepository
-	avatarService port.AvatarService
+	repo port.SessionRepository
 }
 
-// Методы для работы с сессиями
+func NewSessionService(r port.SessionRepository) *SessionService {
+	return &SessionService{repo: r}
+}
+
+func (s *SessionService) CreateSession() (*entity.Session, error) {
+	id := utils.GenerateSessionID()
+	session := &entity.Session{
+		ID:        id,
+		ExpiresAt: time.Now().Add(30 * 24 * time.Hour),
+	}
+	err := s.repo.Save(session)
+	if err != nil {
+		return nil, err
+	}
+	return session, nil
+}
+
+func (s *SessionService) GetSession(id string) (*entity.Session, error) {
+	return s.repo.Get(id)
+}
+
+func (s *SessionService) DeleteSession(id string) error {
+	return s.repo.Delete(id)
+}

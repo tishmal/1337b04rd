@@ -22,8 +22,7 @@ type CommentRepository interface {
 }
 
 type SessionRepository interface {
-	// Create(session *entity.Session) error
-	// Get(id string) (*entity.Session, error)
-	// Delete(id string) error
-	// // Другие методы...
+	Save(session *entity.Session) error
+	Get(sessionID string) (*entity.Session, error)
+	Delete(sessionID string) error
 }
