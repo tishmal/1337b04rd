@@ -7,8 +7,10 @@ import (
 	"net/http"
 	"os"
 
+	"1337B04RD/config"
 	utils "1337B04RD/helper"
 	adapter_http "1337B04RD/internal/adapter/http"
+	"1337B04RD/internal/app/common/logger"
 	domain_port "1337B04RD/internal/domain/port"
 	"1337B04RD/internal/domain/service"
 )
@@ -22,6 +24,10 @@ func main() {
 		utils.Helper()
 		return
 	}
+
+	// Load config and init logger
+	cfg := config.Load()
+	logger.Init(cfg.AppEnv)
 
 	// Инициализация логгера
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
