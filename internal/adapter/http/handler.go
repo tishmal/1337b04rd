@@ -43,6 +43,8 @@ func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	content := r.FormValue("comment")
 	file, fileHeader, err := r.FormFile("file")
 
+	sessionID := r.Header.Get("X-Session-ID")
+
 	// var imageURL string
 	if err == nil {
 		defer file.Close()
@@ -62,9 +64,6 @@ func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		// 	return
 		// }
 	}
-
-	// TODO: session ID из куки
-	sessionID := "some-session"
 
 	// Создание поста
 	post, err := h.postService.CreatePost(r.Context(), userName, title, content, sessionID)

@@ -7,8 +7,7 @@ import (
 func (r *PostgresRepository) Save(session *entity.Session) error {
 	_, err := r.db.Exec(`
 		INSERT INTO sessions (session_id, expires_at)
-		VALUES ($1, $2)
-		ON CONFLICT (session_id) DO NOTHING;
+		VALUES ($1, $2);
 	`, session.ID, session.ExpiresAt)
 	return err
 }

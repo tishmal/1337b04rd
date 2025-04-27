@@ -39,7 +39,7 @@ func main() {
 	// Инициализация сервисов
 	postService := service.NewPostService(postRepo, commentRepo, s3, logger)
 	// rickMortyAPI добавить в параметры :
-	sessionService := service.NewSessionService(sessionRepo)
+	sessionService := service.NewSessionService(sessionRepo, logger)
 
 	// Инициализация обработчиков
 	handler := adapter_http.NewHandler(postService, sessionService)

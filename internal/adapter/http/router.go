@@ -7,21 +7,21 @@ import (
 	"1337B04RD/internal/domain/service"
 )
 
-func SetupRoutes(handler *Handler, sessionService *service.SessionService) *http.ServeMux {
+func SetupRoutes(handler *Handler, sessionService *service.SessionService) http.Handler {
 	router := http.NewServeMux()
 
 	// ---------- HTML Views ----------
 	router.HandleFunc("/catalog", handler.CatalogHandler)
-	//router.HandleFunc("/post/", handler.SinglePostPageHandler)
-	router.HandleFunc("/submit-post", EnsureSession(sessionService, handler.CreatePostHandler))
+	// router.HandleFunc("/post/", handler.SinglePostPageHandler)
+	router.HandleFunc("/submit-post", handler.CreatePostHandler)
 
 	// ---------- API: Post ----------
-	//router.HandleFunc("/api/posts", EnsureSession(sessionService, handler.PostsHandler))
-	//router.HandleFunc("/api/posts/", handler.PostByIDHandler)
+	// router.HandleFunc("/api/posts", handler.PostsHandler)
+	// router.HandleFunc("/api/posts/", handler.PostByIDHandler)
 
 	// ---------- API: Session / Cookies ----------
-	//router.HandleFunc("/api/session", handler.SessionHandler)
-	//router.HandleFunc("/api/logout", handler.LogoutHandler)
+	// router.HandleFunc("/api/session", handler.SessionHandler)
+	// router.HandleFunc("/api/logout", handler.LogoutHandler)
 
 	// ---------- Static Files ----------
 	fs := http.FileServer(http.Dir(filepath.Join("web", "static", "templates")))
@@ -35,5 +35,6 @@ func SetupRoutes(handler *Handler, sessionService *service.SessionService) *http
 		w.Write([]byte("pong"))
 	})
 
-	return router
+	// ---------- Оборачиваем весь роутер ----------
+	return WithConditionalSessionMiddleware(sessionService, router)
 }
