@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"os"
 
 	"1337B04RD/config"
 	utils "1337B04RD/helper"
+	adapter_db "1337B04RD/internal/adapter/db"
 	adapter_http "1337B04RD/internal/adapter/http"
+	"1337B04RD/internal/adapter/postgres"
 	"1337B04RD/internal/app/common/logger"
 	domain_port "1337B04RD/internal/domain/port"
 	"1337B04RD/internal/domain/service"
@@ -29,12 +30,18 @@ func main() {
 	cfg := config.Load()
 	logger.Init(cfg.AppEnv)
 
-	// Инициализация логгера
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	// connection postgreSQL
+	db, err := postgres.NewPostgresDB(cfg)
+	if err != nil {
+		logger.Error("failed to connect to DB", "err", err)
+		return
+	}
+	defer db.Close()
 
-	// Инициализация адаптеров
-	dbAdapter := initDatabase(logger)
-	s3 := initS3Storage(logger)
+	logger.Info("connected to PostgreSQL", "host", cfg.DB.Host, "db", cfg.DB.Name)
+
+	dbAdapter := adapter_db.NewPostgresRepository(db)
+
 	// rickMortyAPI := initRickMortyAPI()
 
 	// Инициализация репозиториев
