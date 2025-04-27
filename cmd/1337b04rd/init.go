@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	dbadapter "1337B04RD/internal/adapter/db"
-	storageS3 "1337B04RD/internal/adapter/storage"
+	s3 "1337B04RD/internal/adapter/s3"
 
 	_ "github.com/lib/pq"
 )
@@ -44,7 +44,7 @@ func initDatabase(logger *slog.Logger) *dbadapter.PostgresRepository {
 	return dbadapter.NewPostgresRepository(db)
 }
 
-func initS3Storage(logger *slog.Logger) *storageS3.S3Storage {
+func initS3Storage(logger *slog.Logger) *s3.S3Client {
 	endpoint := getEnv("S3_ENDPOINT", "localhost:9000")
 
 	// Добавляем протокол, если его нет
@@ -61,7 +61,7 @@ func initS3Storage(logger *slog.Logger) *storageS3.S3Storage {
 	logger.Info("Initializing S3 storage", "endpoint", endpoint)
 
 	// Инициализация клиента S3
-	storage, err := storageS3.NewS3Storage(endpoint, accessKey, secretKey, useSSL, postBucket, commentBucket, logger)
+	storage, err := s3.NewS3Storage(endpoint, accessKey, secretKey, useSSL, postBucket, commentBucket, logger)
 	if err != nil {
 		logger.Error("Failed to initialize S3 storage", "error", err)
 		os.Exit(1)
