@@ -27,14 +27,6 @@ func (r *PostgresRepository) GetDB() *sql.DB {
 
 // Реализация интерфейса PostRepository
 func (r *PostgresRepository) Create(ctx context.Context, post *entity.Post) (*entity.Post, error) {
-	_, err1 := r.db.Exec(`
-  INSERT INTO sessions (session_id, expires_at)
-  VALUES ($1, NOW() + INTERVAL '1 day')
-  ON CONFLICT (session_id) DO NOTHING
-`, post.SessionID)
-	if err1 != nil {
-		return nil, err1
-	}
 
 	query := `INSERT INTO posts (post_id, title, content, user_avatar_id, session_id, user_name)
 	          VALUES ($1, $2, $3, $4, $5, $6)

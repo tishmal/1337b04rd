@@ -28,19 +28,18 @@ func NewPostService(postRepo port.PostRepository, commentRepo port.CommentReposi
 // // Методы для работы с постами
 // (title, content string, image []byte, userID, userName, avatarURL string)
 // Логика создания поста
-func (s *PostService) CreatePost(ctx context.Context, userName, title, content, sessionID string) (*entity.Post, error) {
+func (s *PostService) CreatePost(ctx context.Context, userName, title, content, session_id string) (*entity.Post, error) {
 	s.logger.Info("Start CreatePost",
 		"title", title,
 		"content", content,
-		"sessionID", sessionID,
 	)
 
 	newPost := entity.Post{
-		ID:           uuid.New().String(),
+		PostID:       uuid.New().String(),
 		UserName:     userName,
 		Title:        title,
 		Content:      content,
-		SessionID:    sessionID,
+		SessionID:    session_id,
 		UserAvatarID: 0, // заглушка
 	}
 
@@ -55,7 +54,7 @@ func (s *PostService) CreatePost(ctx context.Context, userName, title, content, 
 		return &entity.Post{}, err
 	}
 
-	s.logger.Info("Post created successfully", "postID", post.ID)
+	s.logger.Info("Post created successfully", "postID", post.PostID)
 	return post, nil
 }
 

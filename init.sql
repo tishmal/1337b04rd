@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 CREATE TABLE IF NOT EXISTS posts (
     id SERIAL PRIMARY KEY,
-    post_id VARCHAR(50) NOT NULL UNIQUE,  -- Уменьшен размер, если это возможно
+    post_id VARCHAR(50) NOT NULL,  -- Уменьшен размер, если это возможно
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     image_path VARCHAR(255),

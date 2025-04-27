@@ -9,17 +9,15 @@ import (
 
 // internal/adapter/http/handler.go
 type Handler struct {
-	postService *service.PostService
-	// sessionService *service.SessionService
-	templates *template.Template
+	postService    *service.PostService
+	sessionService *service.SessionService
+	templates      *template.Template
 }
 
-// NewHandler(postService *service.PostService, sessionService *service.SessionService)
-func NewHandler(postService *service.PostService) *Handler {
+func NewHandler(postService *service.PostService, sessionService *service.SessionService) *Handler {
 	// Загрузка шаблонов
 	templates := template.Must(template.ParseGlob("web/static/templates/*.html"))
-	return &Handler{postService, templates}
-	// return &Handler{postService, sessionService, templates}
+	return &Handler{postService, sessionService, templates}
 }
 
 func (h *Handler) CatalogHandler(w http.ResponseWriter, r *http.Request) {
@@ -45,6 +43,8 @@ func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	content := r.FormValue("comment")
 	file, fileHeader, err := r.FormFile("file")
 
+	sessionID := r.Header.Get("X-Session-ID")
+
 	// var imageURL string
 	if err == nil {
 		defer file.Close()
@@ -64,9 +64,6 @@ func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		// 	return
 		// }
 	}
-
-	// TODO: session ID из куки
-	sessionID := "some-session"
 
 	// Создание поста
 	post, err := h.postService.CreatePost(r.Context(), userName, title, content, sessionID)

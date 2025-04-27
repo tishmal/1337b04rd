@@ -3,22 +3,38 @@ package http
 import (
 	"net/http"
 	"path/filepath"
+
+	"1337B04RD/internal/domain/service"
 )
 
-func SetupRoutes(handler *Handler) *http.ServeMux {
+func SetupRoutes(handler *Handler, sessionService *service.SessionService) http.Handler {
 	router := http.NewServeMux()
 
-	// Обработка перенаправлений на catalog.html
-	router.HandleFunc("/", handler.CatalogHandler)
+	// ---------- HTML Views ----------
 	router.HandleFunc("/catalog", handler.CatalogHandler)
-
-	// Обработка маршрута для создания постов
+	// router.HandleFunc("/post/", handler.SinglePostPageHandler)
 	router.HandleFunc("/submit-post", handler.CreatePostHandler)
 
-	// Подключаем статические файлы из папки web/static/templates
-	// Пример: если файл catalog.html находится в web/static/templates/catalog.html
+	// ---------- API: Post ----------
+	// router.HandleFunc("/api/posts", handler.PostsHandler)
+	// router.HandleFunc("/api/posts/", handler.PostByIDHandler)
+
+	// ---------- API: Session / Cookies ----------
+	// router.HandleFunc("/api/session", handler.SessionHandler)
+	// router.HandleFunc("/api/logout", handler.LogoutHandler)
+
+	// ---------- Static Files ----------
 	fs := http.FileServer(http.Dir(filepath.Join("web", "static", "templates")))
 	router.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	return router
+	router.Handle("/media/", http.StripPrefix("/media/", http.FileServer(http.Dir("web/media"))))
+
+	// ---------- Healthcheck ----------
+	router.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("pong"))
+	})
+
+	// ---------- Оборачиваем весь роутер ----------
+	return WithConditionalSessionMiddleware(sessionService, router)
 }
