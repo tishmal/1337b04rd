@@ -1,7 +1,9 @@
 package s3
 
 import (
-	"1337b04rd/internal/app/common/logger"
+	"1337B04RD/internal/app/common/logger"
+	"1337B04RD/internal/app/common/utils"
+
 	"bytes"
 	"context"
 	"fmt"
@@ -11,8 +13,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	uuidHelper "1337b04rd/internal/app/common/utils"
 )
 
 type S3Client struct {
@@ -30,7 +30,7 @@ func NewS3Client(endpoint, bucket string) *S3Client {
 }
 
 func (s *S3Client) UploadImage(file io.Reader, _ int64, contentType string) (string, error) {
-	fileID, err := uuidHelper.NewUUID()
+	fileID, err := utils.NewUUID()
 	if err != nil {
 		logger.Error("failed to generate UUID", "error", err)
 		return "", err
@@ -41,7 +41,7 @@ func (s *S3Client) UploadImage(file io.Reader, _ int64, contentType string) (str
 	if len(exts) > 0 {
 		ext = exts[0]
 	}
-	fileName := fmt.Sprintf("%s%s", fileID.String(), ext)
+	fileName := fmt.Sprintf("%s%s", fileID, ext)
 
 	data, err := io.ReadAll(file)
 	if err != nil {
@@ -100,12 +100,12 @@ func (s *S3Client) UploadImagesParallel(files map[string]io.Reader, contentTypes
 				ext = exts[0]
 			}
 
-			fileID, err := uuidHelper.NewUUID()
+			fileID, err := utils.NewUUID()
 			if err != nil {
 				errs <- fmt.Errorf("uuid error (%s): %w", name, err)
 				return
 			}
-			uniqueName := fmt.Sprintf("%s%s", fileID.String(), ext)
+			uniqueName := fmt.Sprintf("%s%s", fileID, ext)
 
 			url := fmt.Sprintf("http://%s/%s/%s", s.endpoint, s.bucket, uniqueName)
 			req, err := http.NewRequestWithContext(ctx, "PUT", url, bytes.NewReader(data))

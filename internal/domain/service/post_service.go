@@ -1,12 +1,13 @@
 package service
 
 import (
+	"1337B04RD/internal/app/common/utils"
 	"1337B04RD/internal/domain/entity"
 	"1337B04RD/internal/domain/port"
+	"fmt"
+
 	"context"
 	"log/slog"
-
-	"github.com/google/uuid"
 )
 
 type PostService struct {
@@ -29,13 +30,26 @@ func NewPostService(postRepo port.PostRepository, commentRepo port.CommentReposi
 // (title, content string, image []byte, userID, userName, avatarURL string)
 // Логика создания поста
 func (s *PostService) CreatePost(ctx context.Context, userName, title, content, session_id string) (*entity.Post, error) {
+	if title == "" {
+		return nil, fmt.Errorf("err Empty Title")
+	}
+
+	if content == "" {
+		return nil, fmt.Errorf("err Empty contnent")
+	}
+
 	s.logger.Info("Start CreatePost",
 		"title", title,
 		"content", content,
 	)
 
+	id, err := utils.NewUUID()
+	if err != nil {
+
+	}
+
 	newPost := entity.Post{
-		PostID:       uuid.New().String(),
+		PostID:       id,
 		UserName:     userName,
 		Title:        title,
 		Content:      content,

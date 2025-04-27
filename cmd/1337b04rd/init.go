@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	dbadapter "1337B04RD/internal/adapter/db"
-	s3 "1337B04RD/internal/adapter/s3"
+	"1337B04RD/internal/adapter/s3"
 
 	_ "github.com/lib/pq"
 )
