@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 
-	utils "1337B04RD/helper"
 	adapter_http "1337B04RD/internal/adapter/http"
 	domain_port "1337B04RD/internal/domain/port"
 	"1337B04RD/internal/domain/service"
