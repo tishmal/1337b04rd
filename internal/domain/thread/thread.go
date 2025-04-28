@@ -3,7 +3,6 @@ package post
 import (
 	"time"
 
-	"1337B04RD/internal/app/common/utils"
 	uuidHelper "1337B04RD/internal/app/common/utils"
 	. "1337B04RD/internal/domain/errors"
 )
@@ -30,12 +29,8 @@ func NewThread(title, content string, imageURLs []string, sessionID uuidHelper.U
 		return nil, ErrInvalidSessionID
 	}
 
-	idStr, err := uuidHelper.NewUUID()
+	id, err := uuidHelper.NewUUID()
 	if err != nil {
-		return nil, err
-	}
-	id, err2 := utils.ParseUUID(idStr)
-	if err2 != nil {
 		return nil, err
 	}
 
