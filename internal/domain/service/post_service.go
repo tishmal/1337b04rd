@@ -1,29 +1,25 @@
 package service
 
 import (
+	"1337B04RD/internal/app/common/logger"
 	"1337B04RD/internal/app/common/utils"
 	"1337B04RD/internal/domain/entity"
 	"1337B04RD/internal/domain/port"
 	"fmt"
 
 	"context"
-	"log/slog"
 )
 
 type PostService struct {
-	postRepo     port.PostRepository
-	commentRepo  port.CommentRepository
-	imageStorage port.ImageStorage
-	logger       *slog.Logger
+	postRepo    port.PostRepository
+	commentRepo port.CommentRepository
 }
 
 // Инициализация сервиса
-func NewPostService(postRepo port.PostRepository, commentRepo port.CommentRepository, imageStorage port.ImageStorage, logger *slog.Logger) *PostService {
+func NewPostService(postRepo port.PostRepository, commentRepo port.CommentRepository) *PostService {
 	return &PostService{
-		postRepo:     postRepo,
-		commentRepo:  commentRepo,
-		imageStorage: imageStorage,
-		logger:       logger}
+		postRepo:    postRepo,
+		commentRepo: commentRepo}
 }
 
 // // Методы для работы с постами
@@ -38,7 +34,7 @@ func (s *PostService) CreatePost(ctx context.Context, userName, title, content, 
 		return nil, fmt.Errorf("err Empty contnent")
 	}
 
-	s.logger.Info("Start CreatePost",
+	logger.Info("Start CreatePost",
 		"title", title,
 		"content", content,
 	)
@@ -57,18 +53,18 @@ func (s *PostService) CreatePost(ctx context.Context, userName, title, content, 
 		UserAvatarID: 0, // заглушка
 	}
 
-	s.logger.Info("Creating post in repository", "postID", newPost.ID)
+	logger.Info("Creating post in repository", "postID", newPost.ID)
 
 	post, err := s.postRepo.Create(ctx, &newPost)
 	if err != nil {
-		s.logger.Error("Failed to create post in repository",
+		logger.Error("Failed to create post in repository",
 			"error", err,
 			"postID", newPost.ID,
 		)
 		return &entity.Post{}, err
 	}
 
-	s.logger.Info("Post created successfully", "postID", post.PostID)
+	logger.Info("Post created successfully", "postID", post.PostID)
 	return post, nil
 }
 

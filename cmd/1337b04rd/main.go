@@ -11,6 +11,7 @@ import (
 	adapter_db "1337B04RD/internal/adapter/db"
 	adapter_http "1337B04RD/internal/adapter/http"
 	"1337B04RD/internal/adapter/postgres"
+	"1337B04RD/internal/adapter/s3"
 	"1337B04RD/internal/app/common/logger"
 	domain_port "1337B04RD/internal/domain/port"
 	"1337B04RD/internal/domain/service"
@@ -42,17 +43,25 @@ func main() {
 
 	dbAdapter := adapter_db.NewPostgresRepository(db)
 
-	// rickMortyAPI := initRickMortyAPI()
+	//httpClient := &http.Client{}
 
-	// Инициализация репозиториев
+	// init repositories
 	var postRepo domain_port.PostRepository = dbAdapter
 	var commentRepo domain_port.CommentRepository = dbAdapter
 	var sessionRepo domain_port.SessionRepository = dbAdapter
 
-	// Инициализация сервисов
-	postService := service.NewPostService(postRepo, commentRepo, s3, logger)
-	// rickMortyAPI добавить в параметры :
-	sessionService := service.NewSessionService(sessionRepo, logger)
+	// S3 clients for threads and comments
+	s3ThreadsClient := s3.NewS3Client(cfg.S3.Endpoint, cfg.S3.BucketThreads)
+	s3CommentsClient := s3.NewS3Client(cfg.S3.Endpoint, cfg.S3.BucketComments)
+
+	// Services
+	// avatar
+	sessionService := service.NewSessionService(sessionRepo)
+
+	postS3Adapter := s3.NewAdapter(s3ThreadsClient)
+	commentS3Adapter := s3.NewAdapter(s3CommentsClient)
+
+	postService := service.NewPostService(postRepo, commentRepo, postS3Adapter)
 
 	// Инициализация обработчиков
 	handler := adapter_http.NewHandler(postService, sessionService)

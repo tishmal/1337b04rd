@@ -1,22 +1,20 @@
 package service
 
 import (
+	"1337B04RD/internal/app/common/logger"
 	"1337B04RD/internal/domain/entity"
 	"1337B04RD/internal/domain/port"
 	"1337B04RD/internal/utils"
-	"log/slog"
 	"time"
 )
 
 type SessionService struct {
-	repo   port.SessionRepository
-	logger *slog.Logger
+	repo port.SessionRepository
 }
 
-func NewSessionService(r port.SessionRepository, logger *slog.Logger) *SessionService {
+func NewSessionService(r port.SessionRepository) *SessionService {
 	return &SessionService{
-		repo:   r,
-		logger: logger}
+		repo: r}
 }
 
 func (s *SessionService) CreateSession() (*entity.Session, error) {
@@ -26,7 +24,7 @@ func (s *SessionService) CreateSession() (*entity.Session, error) {
 		ExpiresAt: time.Now().Add(30 * 24 * time.Hour),
 	}
 
-	s.logger.Info("Start Create Session",
+	logger.Info("Start Create Session",
 		"id session", session.ID,
 		"user id", session.ExpiresAt,
 	)
