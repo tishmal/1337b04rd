@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"1337B04RD/internal/domain/service"
+	"1337b04rd/internal/domain/service"
 )
 
 func WithConditionalSessionMiddleware(sessionService *service.SessionService, next http.Handler) http.Handler {

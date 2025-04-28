@@ -1,7 +1,7 @@
 package db
 
 import (
-	"1337B04RD/internal/domain/entity"
+	"1337b04rd/internal/domain/entity"
 )
 
 func (r *PostgresRepository) Save(session *entity.Session) error {

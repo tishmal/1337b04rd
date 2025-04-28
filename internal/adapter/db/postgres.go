@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"1337B04RD/internal/domain/entity"
+	"1337b04rd/internal/domain/entity"
 )
 
 type PostgresRepository struct {

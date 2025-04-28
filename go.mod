@@ -1,3 +1,3 @@
-module 1337B04RD
+module 1337b04rd
 
 go 1.24.2

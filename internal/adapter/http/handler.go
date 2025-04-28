@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"text/template"
 
-	"1337B04RD/internal/domain/service"
+	"1337b04rd/internal/domain/service"
 )
 
 // internal/adapter/http/handler.go

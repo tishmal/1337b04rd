@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"1337B04RD/config"
+	"1337b04rd/config"
 	"database/sql"
 	"fmt"
 	"time"

@@ -3,8 +3,8 @@ package comment
 import (
 	"time"
 
-	uuidHelper "1337B04RD/internal/app/common/utils"
-	. "1337B04RD/internal/domain/errors"
+	uuidHelper "1337b04rd/internal/app/common/utils"
+	. "1337b04rd/internal/domain/errors"
 )
 
 type Comment struct {

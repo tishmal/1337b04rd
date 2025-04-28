@@ -6,15 +6,15 @@ import (
 	"net/http"
 	"os"
 
-	"1337B04RD/config"
-	utils "1337B04RD/helper"
-	adapter_db "1337B04RD/internal/adapter/db"
-	adapter_http "1337B04RD/internal/adapter/http"
-	"1337B04RD/internal/adapter/postgres"
-	"1337B04RD/internal/adapter/s3"
-	"1337B04RD/internal/app/common/logger"
-	domain_port "1337B04RD/internal/domain/port"
-	"1337B04RD/internal/domain/service"
+	"1337b04rd/config"
+	utils "1337b04rd/helper"
+	adapter_db "1337b04rd/internal/adapter/db"
+	adapter_http "1337b04rd/internal/adapter/http"
+	"1337b04rd/internal/adapter/postgres"
+	"1337b04rd/internal/adapter/s3"
+	"1337b04rd/internal/app/common/logger"
+	domain_port "1337b04rd/internal/domain/port"
+	"1337b04rd/internal/domain/services"
 )
 
 func main() {
@@ -56,12 +56,12 @@ func main() {
 
 	// Services
 	// avatar
-	sessionService := service.NewSessionService(sessionRepo)
+	sessionService := services.NewSessionService(sessionRepo)
 
 	postS3Adapter := s3.NewAdapter(s3ThreadsClient)
 	commentS3Adapter := s3.NewAdapter(s3CommentsClient)
 
-	postService := service.NewPostService(postRepo, commentRepo, postS3Adapter)
+	postService := services.NewPostService(postRepo, commentRepo, postS3Adapter)
 
 	// Инициализация обработчиков
 	handler := adapter_http.NewHandler(postService, sessionService)
@@ -72,9 +72,9 @@ func main() {
 	addr := fmt.Sprintf(":%d", *port)
 	// Запуск сервера
 	logger.Info("🚀Starting server on port " + addr)
-	err := http.ListenAndServe(addr, router)
-	if err != nil {
-		logger.Error("Failed to start server", "error", err)
+	errS := http.ListenAndServe(addr, router)
+	if errS != nil {
+		logger.Error("Failed to start server", "error", errS)
 		os.Exit(1)
 	}
 }
