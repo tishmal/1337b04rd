@@ -1,7 +1,7 @@
 package services
 
 import (
-	"1337b04rd/internal/adapters/rickmorty"
+	"1337b04rd/internal/adapter/rickmorty"
 	"1337b04rd/internal/app/common/logger"
 	"1337b04rd/internal/domain/avatar"
 	"1337b04rd/internal/domain/errors"
