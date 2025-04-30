@@ -199,13 +199,13 @@ func (s *ThreadService) CleanupExpiredThreads(ctx context.Context) error {
 	return lastErr
 }
 
-func (s *ThreadService) LikeAdd(ctx context.Context, id uuidHelper.UUID) error {
+func (s *ThreadService) LikeAdd(ctx context.Context, threadID, sessionID uuidHelper.UUID) error {
 	if err := ctx.Err(); err != nil {
 		logger.Warn("context canceled in LikeAdd", "error", err)
 		return err
 	}
 
-	err := s.threadRepo.LikeAdd(ctx, id)
+	err := s.threadRepo.LikeAdd(ctx, threadID, sessionID)
 	if err != nil {
 		logger.Error("failed to add like to thread", "error", err)
 		return err
