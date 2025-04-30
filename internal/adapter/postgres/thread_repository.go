@@ -191,7 +191,8 @@ func scanThread(scanner interface {
 
 func (r *ThreadRepository) LikeAdd(ctx context.Context, threadID, sessionID uuidHelper.UUID) error {
 	var exists bool
-	err := r.db.QueryRowContext(ctx, LikeExist, threadID, sessionID).Scan(&exists)
+
+	err := r.db.QueryRowContext(ctx, LikeExist, threadID.String(), sessionID.String()).Scan(&exists)
 	if err != nil {
 		return err
 	}
@@ -199,8 +200,8 @@ func (r *ThreadRepository) LikeAdd(ctx context.Context, threadID, sessionID uuid
 	if exists {
 		return errors.ErrAlreadyLiked
 	}
-
-	_, err = r.db.ExecContext(ctx, LikeAddThread, threadID, sessionID)
+	
+	_, err = r.db.ExecContext(ctx, LikeAddThread, threadID.String())
 
 	return err
 }
