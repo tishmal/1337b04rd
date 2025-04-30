@@ -188,3 +188,19 @@ func scanThread(scanner interface {
 	t.ImageURLs = []string(imageURLs)
 	return t, nil
 }
+
+func (r *ThreadRepository) LikeAdd(ctx context.Context, threadID, sessionID uuidHelper.UUID) error {
+	var exists bool
+	err := r.db.QueryRowContext(ctx, LikeExist, threadID, sessionID).Scan(&exists)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return errors.ErrAlreadyLiked
+	}
+
+	_, err = r.db.ExecContext(ctx, LikeAddThread, threadID, sessionID)
+
+	return err
+}

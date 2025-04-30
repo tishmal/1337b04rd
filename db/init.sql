@@ -2,6 +2,7 @@
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS threads;
 DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS thread_likes;
 
 -- sessions
 CREATE TABLE sessions (
@@ -22,6 +23,7 @@ CREATE TABLE threads (
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     last_commented TIMESTAMP,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    likes INTEGER DEFAULT 0,
 
     CONSTRAINT check_title_not_empty CHECK (char_length(title) > 0),
     CONSTRAINT check_content_not_empty CHECK (char_length(content) > 0)
@@ -38,6 +40,17 @@ CREATE TABLE comments (
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
     CONSTRAINT check_comment_content_not_empty CHECK (char_length(content) > 0)
+);
+
+-- Таблица thread_likes содержит факт: "какая сессия поставила лайк какому посту"
+-- likes
+CREATE TABLE thread_likes (
+    thread_id UUID NOT NULL,
+    session_id UUID NOT NULL,
+    liked_at TIMESTAMP DEFAULT now(),
+    PRIMARY KEY (thread_id, session_id),
+    FOREIGN KEY (thread_id) REFERENCES threads(id) ON DELETE CASCADE,
+    FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
 );
 
 -- triggers

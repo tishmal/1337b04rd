@@ -16,6 +16,7 @@ type Thread struct {
 	CreatedAt     time.Time
 	LastCommented *time.Time
 	IsDeleted     bool
+	Like          int
 }
 
 func NewThread(title, content string, imageURLs []string, sessionID uuidHelper.UUID) (*Thread, error) {

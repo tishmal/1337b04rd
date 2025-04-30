@@ -13,4 +13,5 @@ type ThreadPort interface {
 	UpdateThread(ctx context.Context, t *thread.Thread) error
 	ListActiveThreads(ctx context.Context) ([]*thread.Thread, error)
 	ListAllThreads(ctx context.Context) ([]*thread.Thread, error)
+	LikeAdd(ctx context.Context, id uuidHelper.UUID) error
 }
