@@ -31,4 +31,5 @@ var (
 	ErrSessionExpired      = errors.New("session expired")
 	ErrAvatarAssignment    = errors.New("failed to assign avatar")
 	ErrDisplayNameConflict = errors.New("display name already in use")
+	ErrAlreadyLiked        = errors.New("already liked")
 )

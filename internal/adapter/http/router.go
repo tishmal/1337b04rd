@@ -26,6 +26,7 @@ func NewRouter(
 	mux.HandleFunc("GET /threads/view/", threadHandler.GetThread) // GET /threads/view/{id}
 	mux.HandleFunc("GET /threads", threadHandler.ListActiveThreads)
 	mux.HandleFunc("GET /threads/all", threadHandler.ListAllThreads)
+	mux.HandleFunc("POST /threas/like", threadHandler.LikeAdd)
 
 	// === Комментарии ===
 	mux.HandleFunc("POST /threads/comment", commentHandler.CreateComment)

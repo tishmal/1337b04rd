@@ -155,3 +155,34 @@ func (h *ThreadHandler) ListAllThreads(w http.ResponseWriter, r *http.Request) {
 		logger.Error("failed to encode response", "error", err)
 	}
 }
+
+func (h *ThreadHandler) LikeAdd(w http.ResponseWriter, r *http.Request) {
+	session, ok := GetSessionFromContext(r.Context())
+	if !ok {
+		logger.Warn("session not found in LikeAdd", "context_value", r.Context().Value(sessionKey))
+		Respond(w, http.StatusUnauthorized, map[string]string{"error": "session not found"})
+		return
+	}
+
+	threadIDStr := r.URL.Query().Get("id")
+	if threadIDStr == "" {
+		Respond(w, http.StatusBadRequest, map[string]string{"error": "missing thread ID"})
+		return
+	}
+
+	threadID, err := utils.ParseUUID(threadIDStr)
+	if err != nil {
+		logger.Error("invalid thread ID", "error", err, "thread_id", threadIDStr)
+		Respond(w, http.StatusBadRequest, map[string]string{"error": "invalid thread ID"})
+		return
+	}
+
+	err = h.threadSvc.LikeAdd(r.Context(), threadID, session.ID)
+	if err != nil {
+		logger.Error("failed to add like", "error", err, "thread_id", threadID)
+		Respond(w, http.StatusInternalServerError, map[string]string{"error": "could not add like"})
+		return
+	}
+
+	Respond(w, http.StatusOK, map[string]string{"status": "like added"})
+}
