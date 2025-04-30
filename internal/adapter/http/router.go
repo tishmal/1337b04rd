@@ -1,40 +1,38 @@
 package http
 
 import (
+	"1337b04rd/internal/app/services"
 	"net/http"
-	"path/filepath"
-
-	"1337b04rd/internal/domain/service"
 )
 
-func SetupRoutes(handler *Handler, sessionService *service.SessionService) http.Handler {
-	router := http.NewServeMux()
+func NewRouter(
+	sessionSvc *services.SessionService,
+	avatarSvc *services.AvatarService,
+	threadSvc *services.ThreadService,
+	commentSvc *services.CommentService,
+) http.Handler {
+	mux := http.NewServeMux()
+	sessionHandler := &SessionHandler{SessionService: sessionSvc}
+	threadHandler := &ThreadHandler{threadSvc: threadSvc}
+	commentHandler := &CommentHandler{commentSvc: commentSvc}
 
-	// ---------- HTML Views ----------
-	router.HandleFunc("/catalog", handler.CatalogHandler)
-	// router.HandleFunc("/post/", handler.SinglePostPageHandler)
-	router.HandleFunc("/submit-post", handler.CreatePostHandler)
+	// === Сессии ===
+	mux.HandleFunc("POST /session/name", sessionHandler.ChangeDisplayName)
+	mux.HandleFunc("GET /session/me", sessionHandler.GetSessionInfo)
+	mux.HandleFunc("GET /session/list", sessionHandler.ListSessions)
 
-	// ---------- API: Post ----------
-	// router.HandleFunc("/api/posts", handler.PostsHandler)
-	// router.HandleFunc("/api/posts/", handler.PostByIDHandler)
+	// === Треды ===
+	mux.HandleFunc("POST /threads", threadHandler.CreateThread)
+	mux.HandleFunc("GET /threads/view/", threadHandler.GetThread) // GET /threads/view/{id}
+	mux.HandleFunc("GET /threads", threadHandler.ListActiveThreads)
+	mux.HandleFunc("GET /threads/all", threadHandler.ListAllThreads)
 
-	// ---------- API: Session / Cookies ----------
-	// router.HandleFunc("/api/session", handler.SessionHandler)
-	// router.HandleFunc("/api/logout", handler.LogoutHandler)
+	// === Комментарии ===
+	mux.HandleFunc("POST /threads/comment", commentHandler.CreateComment)
+	mux.HandleFunc("GET /threads/comment", commentHandler.GetCommentsByThreadID)
 
-	// ---------- Static Files ----------
-	fs := http.FileServer(http.Dir(filepath.Join("web", "static", "templates")))
-	router.Handle("/static/", http.StripPrefix("/static/", fs))
+	// === Middleware ===
+	handler := SessionMiddleware(sessionSvc, "1337session")(mux)
 
-	router.Handle("/media/", http.StripPrefix("/media/", http.FileServer(http.Dir("web/media"))))
-
-	// ---------- Healthcheck ----------
-	router.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("pong"))
-	})
-
-	// ---------- Оборачиваем весь роутер ----------
-	return WithConditionalSessionMiddleware(sessionService, router)
+	return handler
 }

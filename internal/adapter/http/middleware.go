@@ -1,49 +1,58 @@
 package http
 
 import (
+	"1337b04rd/internal/app/common/logger"
+	"1337b04rd/internal/app/services"
+	"1337b04rd/internal/domain/session"
+	"context"
 	"net/http"
-	"path/filepath"
-
-	"1337b04rd/internal/domain/service"
 )
 
-func WithConditionalSessionMiddleware(sessionService *service.SessionService, next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Эти пути пропускаем без куки
-		if r.URL.Path == "/ping" ||
-			filepath.HasPrefix(r.URL.Path, "/static/") ||
-			filepath.HasPrefix(r.URL.Path, "/media/") {
-			next.ServeHTTP(w, r)
-			return
-		}
+type contextKey string
 
-		// Логика с кукой прямо здесь (БЕЗ доп обёртки)
-		cookie, err := r.Cookie("session_id")
-		var sessionID string
+const sessionKey contextKey = "session"
 
-		if err != nil || cookie.Value == "" {
-			// Куки нет — создаём новую сессию
-			session, err := sessionService.CreateSession()
-			if err != nil {
-				http.Error(w, "Failed to create session", http.StatusInternalServerError)
-				return
+func GetSessionFromContext(ctx context.Context) (*session.Session, bool) {
+	sess, ok := ctx.Value(sessionKey).(*session.Session)
+	return sess, ok
+}
+
+func SessionMiddleware(svc *services.SessionService, cookieName string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+
+			var sess *session.Session
+			var sessionErr error
+
+			cookie, err := r.Cookie(cookieName)
+			if err == nil {
+				sess, sessionErr = svc.GetOrCreate(ctx, cookie.Value)
 			}
-			sessionID = session.ID
-			http.SetCookie(w, &http.Cookie{
-				Name:     "session_id",
-				Value:    sessionID,
-				Path:     "/",
-				HttpOnly: true,
-				MaxAge:   60 * 60 * 24 * 30, // 30 дней
-			})
-		} else {
-			sessionID = cookie.Value
-		}
 
-		// Пробрасываем в заголовки
-		r.Header.Set("X-Session-ID", sessionID)
+			if sessionErr != nil || sess == nil {
+				logger.Warn("creating new session", "reason", sessionErr)
+				sess, err = svc.CreateNew(ctx)
+				if err != nil {
+					logger.Error("failed to create new session", "error", err)
+					Respond(w, http.StatusInternalServerError, map[string]string{"error": "failed to create session"})
+					return
+				}
 
-		// Теперь вызываем основной роутер
-		next.ServeHTTP(w, r)
-	})
+				http.SetCookie(w, &http.Cookie{
+					Name:     cookieName,
+					Value:    sess.ID.String(),
+					Path:     "/",
+					Expires:  sess.ExpiresAt,
+					HttpOnly: true,
+					SameSite: http.SameSiteLaxMode,
+					Secure:   false,
+				})
+				logger.Info("set new session cookie", "session_id", sess.ID)
+			}
+
+			ctx = context.WithValue(ctx, sessionKey, sess)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
 }
