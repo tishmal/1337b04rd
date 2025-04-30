@@ -1,4 +1,4 @@
-Краткое пособие к запуску
+Краткое пособие к запуску, но основаня информация в Readme
 
 docker compose down -v && docker compose up --build
 

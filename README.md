@@ -1,121 +1,152 @@
-# 1337b04rd 📦
+# 1337b04rd 📂
 
-> **Anonymous image board backend written in Go**
+![Go](https://img.shields.io/badge/Go-1.23-blue) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue) ![Docker](https://img.shields.io/badge/Docker-✓-blue)
 
----
+An anonymous image board backend written in **Go**. Supports threads, comments, image uploads to S3-compatible storage (MinIO), and session tracking via cookies. Built using **Hexagonal Architecture**, follows clean coding principles, and includes a frontend with Go templates.
 
 ## ✨ Features
 
 - 🛸 Anonymous sessions with Rick & Morty avatars
 - 📍 Thread and comment posting
-- 📷 Image uploads to MinIO (S3-compatible)
+- 📷 Image upload support (MinIO / S3-compatible)
 - ⌛ Auto-cleanup of threads without comments
 - ⚖️ Moderation-ready architecture
-- ✨ Clean, layered Go codebase (Hexagonal Architecture)
+- ✨ Clean Go codebase with layered separation
 
----
 
 ## 📚 Tech Stack
 
 - **Go** 1.23+
 - **PostgreSQL**
 - **MinIO** (S3-compatible object storage)
-- **HTML Templates** (server-rendered)
+- **HTML templates** (server-rendered)
 - **TailwindCSS** (frontend styling)
-- **Docker** (local development)
-
----
+- **Docker** (virtualization)
 
 ## 🧬 Project Structure
 
 ```
 1337b04rd/
-├── cmd/               # CLI entrypoint (main.go)
-├── config/            # Manual .env parsing & configuration
-├── db/                # SQL init scripts
-├── internal/          # Core business logic and adapters
-│   ├── adapters/      # Infrastructure adapters (db, http, s3)
-│   │   ├── http/      # HTTP handlers & middleware
-│   │   ├── postgres/  # PostgreSQL repository implementation
-│   │   ├── rickmorty/ # External Rick & Morty avatar client
-│   │   └── s3/        # MinIO/S3 storage client
+├── cmd/                     # CLI entrypoint
+├── config/                  # Manual .env parsing & configuration
+├── db/                      # SQL init scripts
+├── internal/                # Core business logic and adapters
+│   ├── adapters/            # Infrastructure adapters
+│   │   ├── http/            # HTTP handlers & middleware
+│   │   ├── postgres/        # PostgreSQL repositories
+│   │   ├── rickmorty/       # External avatar client
+│   │   └── s3/              # S3/MinIO storage client
 │   ├── app/
-│   │   ├── common/    # Utilities (UUIDs, logger)
-│   │   ├── ports/     # Interfaces for dependency injection
-│   │   └── services/  # Business logic implementation
-│   └── domain/        # Domain models & rules
+│   │   ├── common/
+│   │   │   ├── logger/      # Structured logging
+│   │   │   └── utils/       # Helpers (UUID, etc)
+│   │   ├── ports/           # Interfaces for domain-driven services
+│   │   └── services/        # Business logic
+│   └── domain/              # Core domain models and rules
 │       ├── avatar/
 │       ├── comment/
 │       ├── errors/
 │       ├── session/
 │       └── thread/
-├── test/              # Unit & integration tests
+├── test/                    # Tests and testdata
 │   ├── integration/
 │   ├── testdata/
 │   └── unit/
-└── web/               # Frontend (templates + static assets)
-    ├── static/        # Static files (images, CSS)
-    └── templates/     # HTML templates
+└── web/                     # Frontend
+    ├── static/              # Static assets (img)
+    │   └── img/
+    └── templates/           # HTML templates
 ```
 
----
+## ╰┈➤ Getting Started (Local)
 
-## 🚀 Getting Started
+### 1. Clone & Init
 
 ```bash
-# Clone the repository
-git clone https://your-repo-url/1337b04rd.git
-
-# Move into project directory
+git clone git@git.platform.alem.school:tishmal/1337b04rd.git
 cd 1337b04rd
-
-# Build and run
-docker-compose up --build
 ```
 
----
+### 2. Setup `.env`
 
-## 🛠️ Environment Variables
+Create `.env` based on `.env.example`:
 
-Create a `.env` file:
-
-```bash
+```env
+# HTTP server
 PORT=8080
 
+# PostgreSQL
 DB_HOST=localhost
 DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=password
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
 DB_NAME=1337b04rd
 DB_SSLMODE=disable
 
-S3_ENDPOINT=localhost:9000
-S3_ACCESS_KEY=minioadmin
-S3_SECRET_KEY=minioadmin
-S3_BUCKET_THREADS=threads
-S3_BUCKET_COMMENTS=comments
+# S3-compatible storage (MinIO or triple-s)
+S3_ENDPOINT=minio:9000
+S3_ACCESS_KEY=your_s3_key
+S3_SECRET_KEY=your_s3_secret
+S3_BUCKET_THREADS=1337-threads
+S3_BUCKET_COMMENTS=1337-comments
 S3_REGION=us-east-1
 S3_USE_SSL=false
 
+# Rick and Morty API
+AVATAR_API_BASE_URL=https://rickandmortyapi.com/api
+
+# Session settings
 SESSION_COOKIE_NAME=1337session
 SESSION_DURATION_DAYS=7
 
-AVATAR_API_BASE_URL=https://rickandmortyapi.com/api/character
+# App mode (for logging, etc.)
 APP_ENV=development
 ```
 
----
+### 3. Run MinIO
 
-## 🧹 Code Quality
+Use:
+```bash
+docker-compose up --build
+```
 
-- Hexagonal Architecture
-- Clean, layered design
-- Structured logging (`slog`)
-- Environment-based configuration
+## 🎨 Frontend (Python)
 
----
+Open with VSCode Live Server or Python:
+
+```bash
+cd web/templates
+python -m SimpleHTTPServer 'port'
+```
+
+Then open:
+```
+http://localhost:'port'/catalog.html or what do you want to open
+```
+```
+psql -h localhost -U your_db_user -d your_db_password
+```
+
+## 📑 Tests
+
+```bash
+go test ./...
+```
+
+
+## 👨🏻‍💻 Authors
+
+- [![Status](https://img.shields.io/badge/alem-tishmal-success?logo=github)](https://platform.alem.school/git/tishmal) <a href="https://t.me/tim_shm" target="_blank"><img src="https://img.shields.io/badge/telegram-@tishmal-blue?logo=Telegram" alt="Status" /></a>
+- [![Status](https://img.shields.io/badge/alem-ykabdiye-success?logo=github)](https://platform.alem.school/git/ykabdiye)  <a href="https://t.me/" target="_blank"><img src="https://img.shields.io/badge/telegram-@ykabdiye-blue?logo=Telegram" alt="Status" /></a>
+
+## 🎉 Acknowledgements <a name = "acknowledgement"></a>
+
+This project has been created by:
+
+- Shmal T, ***"FullStack overflow"***
+- ykabdiye, ***"kazakh painter"***
 
 ## 📜 License
 
-Distributed under the MIT License.
-See `LICENSE` for more information.
+Apache License Version 2.0
+
