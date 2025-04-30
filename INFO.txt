@@ -2,7 +2,9 @@
 
 docker compose down -v && docker compose up --build
 
-http://localhost:8080/static/create-post.html
+python -m SimpleHTTPServer 5500
+
+http://localhost:5500/catalog.html
 
 psql -h localhost -U boarduser -d boarddb
 
