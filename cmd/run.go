@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"1337b04rd/config"
+	"1337b04rd/helper"
 
 	"1337b04rd/internal/adapter/postgres"
 	"1337b04rd/internal/adapter/rickmorty"
@@ -16,14 +17,19 @@ import (
 	"os"
 	"time"
 
-	httpadapter "1337b04rd/internal/adapters/http"
+	httpadapter "1337b04rd/internal/adapter/http"
 )
 
 func Run() {
 	// CLI flags
 	port := flag.Int("port", 8080, "Port number")
+	help := flag.Bool("help", false, "Print info")
 	flag.Parse()
 
+	if *help {
+		helper.Helper()
+		return
+	}
 	// Load config and init logger
 	cfg := config.Load()
 	logger.Init(cfg.AppEnv)
