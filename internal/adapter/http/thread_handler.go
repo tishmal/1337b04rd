@@ -14,6 +14,10 @@ type ThreadHandler struct {
 	threadSvc *services.ThreadService
 }
 
+type LikeRequest struct {
+	ThreadID string `json:"thread_id"`
+}
+
 func NewThreadHandler(threadSvc *services.ThreadService) *ThreadHandler {
 	return &ThreadHandler{
 		threadSvc: threadSvc,
@@ -157,6 +161,17 @@ func (h *ThreadHandler) ListAllThreads(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ThreadHandler) LikeAdd(w http.ResponseWriter, r *http.Request) {
+	var req LikeRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, `{"error":"invalid json"}`, http.StatusBadRequest)
+		return
+	}
+
+	if req.ThreadID == "" {
+		Respond(w, http.StatusBadRequest, map[string]string{"error": "missing thread ID"})
+		return
+	}
+
 	session, ok := GetSessionFromContext(r.Context())
 	if !ok {
 		logger.Warn("session not found in LikeAdd", "context_value", r.Context().Value(sessionKey))
@@ -164,25 +179,22 @@ func (h *ThreadHandler) LikeAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	threadIDStr := r.URL.Query().Get("id")
-	if threadIDStr == "" {
-		Respond(w, http.StatusBadRequest, map[string]string{"error": "missing thread ID"})
-		return
-	}
-
-	threadID, err := utils.ParseUUID(threadIDStr)
+	threadID, err := utils.ParseUUID(req.ThreadID)
 	if err != nil {
-		logger.Error("invalid thread ID", "error", err, "thread_id", threadIDStr)
+		logger.Error("invalid thread ID", "error", err, "thread_id", req.ThreadID)
 		Respond(w, http.StatusBadRequest, map[string]string{"error": "invalid thread ID"})
 		return
 	}
 
-	err = h.threadSvc.LikeAdd(r.Context(), threadID, session.ID)
+	likes, err := h.threadSvc.LikeAdd(r.Context(), threadID, session.ID)
 	if err != nil {
 		logger.Error("failed to add like", "error", err, "thread_id", threadID)
 		Respond(w, http.StatusInternalServerError, map[string]string{"error": "could not add like"})
 		return
 	}
 
-	Respond(w, http.StatusOK, map[string]string{"status": "like added"})
+	Respond(w, http.StatusOK, map[string]interface{}{
+		"status": "like added",
+		"likes":  likes,
+	})
 }

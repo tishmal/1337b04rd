@@ -16,7 +16,7 @@ type Thread struct {
 	CreatedAt     time.Time
 	LastCommented *time.Time
 	IsDeleted     bool
-	Like          int
+	Likes         int `json:"likes"`
 }
 
 func NewThread(title, content string, imageURLs []string, sessionID uuidHelper.UUID) (*Thread, error) {

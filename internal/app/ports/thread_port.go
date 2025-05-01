@@ -14,4 +14,5 @@ type ThreadPort interface {
 	ListActiveThreads(ctx context.Context) ([]*thread.Thread, error)
 	ListAllThreads(ctx context.Context) ([]*thread.Thread, error)
 	LikeAdd(ctx context.Context, threadID, sessionID uuidHelper.UUID) error
+	GetCountLikes(ctx context.Context, threadID uuidHelper.UUID) (int, error)
 }
