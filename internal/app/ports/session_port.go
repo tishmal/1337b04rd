@@ -1,8 +1,9 @@
 package ports
 
 import (
-	"1337b04rd/internal/domain/session"
 	"context"
+
+	"1337b04rd/internal/domain/session"
 )
 
 type SessionPort interface {

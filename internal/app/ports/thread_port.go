@@ -1,8 +1,9 @@
 package ports
 
 import (
-	"1337b04rd/internal/domain/thread"
 	"context"
+
+	"1337b04rd/internal/domain/thread"
 
 	uuidHelper "1337b04rd/internal/app/common/utils"
 )
@@ -14,5 +15,6 @@ type ThreadPort interface {
 	ListActiveThreads(ctx context.Context) ([]*thread.Thread, error)
 	ListAllThreads(ctx context.Context) ([]*thread.Thread, error)
 	LikeAdd(ctx context.Context, threadID, sessionID uuidHelper.UUID) error
+	LikeRemove(ctx context.Context, threadID, sessionID uuidHelper.UUID) error
 	GetCountLikes(ctx context.Context, threadID uuidHelper.UUID) (int, error)
 }

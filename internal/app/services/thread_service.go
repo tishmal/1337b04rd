@@ -1,9 +1,6 @@
 package services
 
 import (
-	"1337b04rd/internal/app/common/logger"
-	"1337b04rd/internal/app/ports"
-	"1337b04rd/internal/domain/thread"
 	"bytes"
 	"context"
 	"fmt"
@@ -11,6 +8,10 @@ import (
 	"mime/multipart"
 	"strings"
 	"time"
+
+	"1337b04rd/internal/app/common/logger"
+	"1337b04rd/internal/app/ports"
+	"1337b04rd/internal/domain/thread"
 
 	uuidHelper "1337b04rd/internal/app/common/utils"
 )
@@ -219,6 +220,6 @@ func (s *ThreadService) LikeAdd(ctx context.Context, threadID, sessionID uuidHel
 		return 0, err
 	}
 
-	//logger.Info("Added success ❤️", "likes", likes, "thread_id", threadID, "session_id", sessionID)
+	// logger.Info("Added success ❤️", "likes", likes, "thread_id", threadID, "session_id", sessionID)
 	return likes, nil
 }

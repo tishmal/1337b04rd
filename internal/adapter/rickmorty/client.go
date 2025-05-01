@@ -1,11 +1,12 @@
 package rickmorty
 
 import (
-	"1337b04rd/internal/app/common/logger"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+
+	"1337b04rd/internal/app/common/logger"
 )
 
 type character struct {

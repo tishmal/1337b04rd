@@ -1,6 +1,13 @@
 package cmd
 
 import (
+	"context"
+	"flag"
+	"fmt"
+	"net/http"
+	"os"
+	"time"
+
 	"1337b04rd/config"
 	"1337b04rd/helper"
 
@@ -10,12 +17,6 @@ import (
 
 	"1337b04rd/internal/app/common/logger"
 	"1337b04rd/internal/app/services"
-	"context"
-	"flag"
-	"fmt"
-	"net/http"
-	"os"
-	"time"
 
 	httpadapter "1337b04rd/internal/adapter/http"
 )

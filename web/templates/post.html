@@ -64,18 +64,16 @@
 				const thread = await response.json();
 
 				document.getElementById("thread").innerHTML = `
-			<h2 class="text-xl font-semibold">${thread.Title}</h2>
-			<p class="text-gray-400">${thread.Content}</p>
-			${thread.ImageURLs?.length > 0
+ <h2 class="text-xl font-semibold">${thread.Title}</h2>
+ <p class="text-gray-400">${thread.Content}</p>
+${thread.ImageURLs?.length > 0
 						? thread.ImageURLs.map((url) => `<img src="${url}" class="w-full max-w-md rounded my-2">`).join("")
 						: ""}
-			<p class="text-sm text-gray-500">Posted: ${new Date(thread.CreatedAt).toLocaleString()}</p>
-			<p id="likes-count" class="text-sm text-gray-300">Likes: ${thread.likes || 0}</p>
-			<button id="like-button" class="mt-2 bg-pink-600 hover:bg-pink-700 px-3 py-1 rounded text-sm">
-				❤️ Like
-			</button>
-		`;
-
+ <p class="text-sm text-gray-500">Posted: ${new Date(thread.CreatedAt).toLocaleString()}</p>
+ <button id="like-button" class="mt-2 bg-pink-600 hover:bg-pink-700 px-3 py-1 rounded text-sm">
+ ❤️ ${thread.likes || 0}
+ </button>
+ `;
 				// Навешиваем обработчик кнопки
 				document.getElementById("like-button").addEventListener("click", () => handleLike(threadId));
 
@@ -101,7 +99,8 @@
 				}
 
 				const result = await response.json();
-				document.getElementById("likes-count").textContent = `Likes: ${result.likes}`;
+				// Update the like button text directly
+				document.getElementById("like-button").innerHTML = `❤️ ${result.likes}`;
 			} catch (error) {
 				alert("Error liking thread: " + error.message);
 			}

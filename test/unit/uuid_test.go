@@ -1,8 +1,9 @@
 package unit
 
 import (
-	"1337b04rd/internal/app/common/utils"
 	"testing"
+
+	"1337b04rd/internal/app/common/utils"
 )
 
 func TestNewUUID(t *testing.T) {

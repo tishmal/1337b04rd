@@ -1,12 +1,13 @@
 package postgres
 
 import (
-	"1337b04rd/internal/app/common/logger"
-	"1337b04rd/internal/domain/errors"
-	"1337b04rd/internal/domain/thread"
 	"context"
 	"database/sql"
 	"time"
+
+	"1337b04rd/internal/app/common/logger"
+	"1337b04rd/internal/domain/errors"
+	"1337b04rd/internal/domain/thread"
 
 	uuidHelper "1337b04rd/internal/app/common/utils"
 
@@ -146,7 +147,8 @@ func (r *ThreadRepository) ListAllThreads(ctx context.Context) ([]*thread.Thread
 
 func scanThread(scanner interface {
 	Scan(dest ...interface{}) error
-}) (*thread.Thread, error) {
+},
+) (*thread.Thread, error) {
 	t := &thread.Thread{}
 	var (
 		imageURLs     pq.StringArray
@@ -199,6 +201,7 @@ func (r *ThreadRepository) LikeAdd(ctx context.Context, threadID, sessionID uuid
 	}
 
 	if exists {
+		r.LikeRemove(ctx, threadID, sessionID)
 		return nil
 	}
 
@@ -228,6 +231,20 @@ func (r *ThreadRepository) LikeAdd(ctx context.Context, threadID, sessionID uuid
 	}
 
 	return tx.Commit()
+}
+
+func (r *ThreadRepository) LikeRemove(ctx context.Context, threadID, sessionID uuidHelper.UUID) error {
+	_, err := r.db.ExecContext(ctx, LikeRemoveThread, threadID.String())
+	if err != nil {
+		return err
+	}
+
+	_, err = r.db.ExecContext(ctx, ThreadLikesDelete, threadID.String(), sessionID.String())
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *ThreadRepository) GetCountLikes(ctx context.Context, threadID uuidHelper.UUID) (int, error) {

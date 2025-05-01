@@ -1,13 +1,14 @@
 package services
 
 import (
+	"math/rand"
+	"sync"
+	"time"
+
 	"1337b04rd/internal/adapter/rickmorty"
 	"1337b04rd/internal/app/common/logger"
 	"1337b04rd/internal/domain/avatar"
 	"1337b04rd/internal/domain/errors"
-	"math/rand"
-	"sync"
-	"time"
 )
 
 type AvatarService struct {
