@@ -67,9 +67,7 @@
 			<h2 class="text-xl font-semibold">${thread.Title}</h2>
 			<p class="text-gray-400">${thread.Content}</p>
 			${thread.ImageURLs?.length > 0
-						? thread.ImageURLs
-							.map((url) => `<img src="${url}" class="w-full max-w-md rounded my-2">`)
-							.join("")
+						? thread.ImageURLs.map((url) => `<img src="${url}" class="w-full max-w-md rounded my-2">`).join("")
 						: ""}
 			<p class="text-sm text-gray-500">Posted: ${new Date(thread.CreatedAt).toLocaleString()}</p>
 			<p id="likes-count" class="text-sm text-gray-300">Likes: ${thread.likes || 0}</p>
@@ -78,11 +76,8 @@
 			</button>
 		`;
 
-				// Добавляем обработчик лайка после отрисовки
-				setTimeout(() => {
-					document.getElementById("like-button")?.addEventListener("click", () => handleLike(threadId));
-					console.log("Button before addEventListener:", btn); // ← это должно быть НЕ null
-				}, 0);
+				// Навешиваем обработчик кнопки
+				document.getElementById("like-button").addEventListener("click", () => handleLike(threadId));
 
 			} catch (error) {
 				console.error("Error loading thread:", error);
@@ -105,14 +100,12 @@
 					throw new Error(`Failed to like thread: ${errorText}`);
 				}
 
-				await loadThread(); // Обновить после лайка
+				const result = await response.json();
+				document.getElementById("likes-count").textContent = `Likes: ${result.likes}`;
 			} catch (error) {
 				alert("Error liking thread: " + error.message);
 			}
 		}
-
-		// // Первый запуск
-		// loadThread();
 
 
 		async function loadComments() {

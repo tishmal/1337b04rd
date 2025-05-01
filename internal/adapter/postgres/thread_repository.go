@@ -6,6 +6,7 @@ import (
 	"1337b04rd/internal/domain/thread"
 	"context"
 	"database/sql"
+	"time"
 
 	uuidHelper "1337b04rd/internal/app/common/utils"
 
@@ -198,10 +199,49 @@ func (r *ThreadRepository) LikeAdd(ctx context.Context, threadID, sessionID uuid
 	}
 
 	if exists {
-		return errors.ErrAlreadyLiked
+		return nil
 	}
-	
-	_, err = r.db.ExecContext(ctx, LikeAddThread, threadID.String())
 
-	return err
+	now := time.Now()
+
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p) // проброс паники дальше
+		} else if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	_, err = tx.ExecContext(ctx, ThreadLikesInsert, threadID.String(), sessionID.String(), now)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, LikeAddThread, threadID.String())
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
+func (r *ThreadRepository) GetCountLikes(ctx context.Context, threadID uuidHelper.UUID) (int, error) {
+	if err := ctx.Err(); err != nil {
+		logger.Error("context error while getting likes", "error", err)
+		return 0, err
+	}
+
+	var likes int
+	err := r.db.QueryRowContext(ctx, LikesAll, threadID.String()).Scan(&likes)
+	if err != nil {
+		logger.Error("failed to get likes for thread", "error", err, "thread_id", threadID)
+		return 0, err
+	}
+
+	return likes, nil
 }

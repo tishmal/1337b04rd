@@ -6,7 +6,6 @@ import (
 	"1337b04rd/internal/app/services"
 	"1337b04rd/internal/domain/errors"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 )
@@ -167,7 +166,6 @@ func (h *ThreadHandler) LikeAdd(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"invalid json"}`, http.StatusBadRequest)
 		return
 	}
-	fmt.Println("DADASDADA")
 
 	if req.ThreadID == "" {
 		Respond(w, http.StatusBadRequest, map[string]string{"error": "missing thread ID"})
@@ -188,12 +186,15 @@ func (h *ThreadHandler) LikeAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.threadSvc.LikeAdd(r.Context(), threadID, session.ID)
+	likes, err := h.threadSvc.LikeAdd(r.Context(), threadID, session.ID)
 	if err != nil {
 		logger.Error("failed to add like", "error", err, "thread_id", threadID)
 		Respond(w, http.StatusInternalServerError, map[string]string{"error": "could not add like"})
 		return
 	}
 
-	Respond(w, http.StatusOK, map[string]string{"status": "like added"})
+	Respond(w, http.StatusOK, map[string]interface{}{
+		"status": "like added",
+		"likes":  likes,
+	})
 }

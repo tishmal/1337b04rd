@@ -30,14 +30,23 @@ const (
 		SELECT id, title, content, image_url, session_id, 
 		       created_at, last_commented, is_deleted
 		FROM threads`
+
 	LikeExist = `
         SELECT EXISTS (
             SELECT 1 FROM thread_likes 
 			WHERE thread_id = $1 AND session_id = $2)`
+
 	LikeAddThread = `
 		UPDATE threads
 		SET likes = likes + 1
 		WHERE id = $1`
+
+	LikesAll = `
+		SELECT likes FROM threads WHERE id = $1`
+
+	ThreadLikesInsert = `
+		INSERT INTO thread_likes (thread_id, session_id, liked_at)
+		VALUES ($1, $2, $3)`
 )
 
 // comment repo
