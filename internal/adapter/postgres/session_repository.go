@@ -1,13 +1,14 @@
 package postgres
 
 import (
+	"context"
+	"database/sql"
+	"time"
+
 	"1337b04rd/internal/app/common/logger"
 	"1337b04rd/internal/app/common/utils"
 	"1337b04rd/internal/domain/errors"
 	"1337b04rd/internal/domain/session"
-	"context"
-	"database/sql"
-	"time"
 )
 
 type SessionRepository struct {

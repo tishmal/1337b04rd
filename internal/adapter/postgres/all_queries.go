@@ -40,13 +40,19 @@ const (
 		UPDATE threads
 		SET likes = likes + 1
 		WHERE id = $1`
-
+	LikeRemoveThread = `
+		UPDATE threads
+		SET likes=likes - 1
+		WHERE id = $1`
 	LikesAll = `
 		SELECT likes FROM threads WHERE id = $1`
 
 	ThreadLikesInsert = `
 		INSERT INTO thread_likes (thread_id, session_id, liked_at)
 		VALUES ($1, $2, $3)`
+	ThreadLikesDelete = `
+		DELETE FROM thread_likes
+		WHERE thread_id = $1 AND session_id = $2`
 )
 
 // comment repo

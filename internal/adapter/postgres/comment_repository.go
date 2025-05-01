@@ -1,11 +1,12 @@
 package postgres
 
 import (
+	"context"
+	"database/sql"
+
 	"1337b04rd/internal/app/common/logger"
 	"1337b04rd/internal/app/common/utils"
 	"1337b04rd/internal/domain/comment"
-	"context"
-	"database/sql"
 
 	"github.com/lib/pq"
 )
@@ -74,7 +75,8 @@ func (r *CommentRepository) GetCommentsByThreadID(ctx context.Context, threadID 
 
 func scanComment(scanner interface {
 	Scan(dest ...interface{}) error
-}) (*comment.Comment, error) {
+},
+) (*comment.Comment, error) {
 	c := &comment.Comment{}
 	var idStr, threadIDStr, sessionIDStr string
 	var parentID sql.NullString

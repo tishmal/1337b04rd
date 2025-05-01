@@ -1,10 +1,11 @@
 package postgres
 
 import (
-	"1337b04rd/config"
 	"database/sql"
 	"fmt"
 	"time"
+
+	"1337b04rd/config"
 
 	_ "github.com/lib/pq"
 )

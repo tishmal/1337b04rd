@@ -1,11 +1,12 @@
 package http
 
 import (
-	"1337b04rd/internal/app/common/logger"
-	"1337b04rd/internal/app/services"
 	"encoding/json"
 	"net/http"
 	"strings"
+
+	"1337b04rd/internal/app/common/logger"
+	"1337b04rd/internal/app/services"
 )
 
 type SessionHandler struct {

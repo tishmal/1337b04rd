@@ -1,11 +1,12 @@
 package services_test
 
 import (
-	"1337b04rd/internal/app/common/utils"
-	"1337b04rd/internal/domain/session"
 	"errors"
 	"testing"
 	"time"
+
+	"1337b04rd/internal/app/common/utils"
+	"1337b04rd/internal/domain/session"
 )
 
 type SessionInterface interface {

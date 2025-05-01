@@ -1,8 +1,9 @@
 package session
 
 import (
-	"1337b04rd/internal/domain/errors"
 	"time"
+
+	"1337b04rd/internal/domain/errors"
 
 	uuidHelper "1337b04rd/internal/app/common/utils"
 )

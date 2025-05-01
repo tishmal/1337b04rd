@@ -1,9 +1,6 @@
 package s3
 
 import (
-	"1337b04rd/internal/app/common/logger"
-	"1337b04rd/internal/app/common/utils"
-
 	"bytes"
 	"context"
 	"fmt"
@@ -13,6 +10,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"1337b04rd/internal/app/common/logger"
+	"1337b04rd/internal/app/common/utils"
 )
 
 type S3Client struct {

@@ -1,13 +1,14 @@
 package services
 
 import (
+	"context"
+	"errors"
+	"time"
+
 	"1337b04rd/internal/app/common/logger"
 	"1337b04rd/internal/app/common/utils"
 	"1337b04rd/internal/app/ports"
 	"1337b04rd/internal/domain/session"
-	"context"
-	"errors"
-	"time"
 )
 
 type SessionService struct {
