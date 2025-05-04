@@ -6,12 +6,10 @@ import (
 	"io"
 	"testing"
 
-	"1337b04rd/internal/app/common/utils"
+	uuidHelper "1337b04rd/internal/app/common/utils"
 	"1337b04rd/internal/app/services"
 	"1337b04rd/internal/domain/thread"
 )
-
-// --- Моки ---
 
 type mockThreadRepo struct {
 	created *thread.Thread
@@ -23,20 +21,50 @@ func (m *mockThreadRepo) CreateThread(ctx context.Context, t *thread.Thread) err
 	return m.err
 }
 
+// Заглушки
+func (m *mockThreadRepo) GetThreadByID(ctx context.Context, id uuidHelper.UUID) (*thread.Thread, error) {
+	return nil, nil
+}
+func (m *mockThreadRepo) UpdateThread(ctx context.Context, t *thread.Thread) error {
+	return nil
+}
+func (m *mockThreadRepo) ListActiveThreads(ctx context.Context) ([]*thread.Thread, error) {
+	return nil, nil
+}
+func (m *mockThreadRepo) ListAllThreads(ctx context.Context) ([]*thread.Thread, error) {
+	return nil, nil
+}
+func (m *mockThreadRepo) LikeAdd(ctx context.Context, threadID, sessionID uuidHelper.UUID) error {
+	return nil
+}
+func (m *mockThreadRepo) LikeRemove(ctx context.Context, threadID, sessionID uuidHelper.UUID) error {
+	return nil
+}
+func (m *mockThreadRepo) GetCountLikes(ctx context.Context, threadID uuidHelper.UUID) (int, error) {
+	return 0, nil
+}
+
 type mockS3 struct {
-	uploadedURLs []string
-	err          error
+	uploaded map[string]string
+	err      error
 }
 
-func (m *mockS3) UploadImages(files map[string]io.Reader, contentTypes map[string]string) ([]string, error) {
-	return m.uploadedURLs, m.err
+func (s *mockS3) UploadImages(files map[string]io.Reader, contentTypes map[string]string) (map[string]string, error) {
+	return s.uploaded, s.err
+}
+func (s *mockS3) UploadImage(file io.Reader, size int64, contentType string) (string, error) {
+	return "", nil
+}
+func (s *mockS3) DeleteFile(fileName string) error {
+	return nil
 }
 
-// --- Тест ---
 func TestCreateThread_Success(t *testing.T) {
 	repo := &mockThreadRepo{}
 	s3 := &mockS3{
-		uploadedURLs: []string{"http://minio:9000/thread/image1.jpg"},
+		uploaded: map[string]string{
+			"file1.jpg": "http://localhost:9000/thread/image1.jpg",
+		},
 	}
 
 	svc := services.NewThreadService(repo, s3)
@@ -48,10 +76,8 @@ func TestCreateThread_Success(t *testing.T) {
 		"file1.jpg": "image/jpeg",
 	}
 
-	sessionID, err := utils.NewUUID() // или какой-то фиксированный UUID
-	if err != nil {
-		t.Fatalf("expected no error, got: %v", err)
-	}
+	sessionID, _ := uuidHelper.ParseUUID("123e4567e89b12d3a456426614174000")
+
 	threadResult, err := svc.CreateThread(context.TODO(), "Test Title", "Test Content", files, contentTypes, sessionID)
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
@@ -70,7 +96,11 @@ func TestCreateThread_Success(t *testing.T) {
 		t.Errorf("expected image URL '%s', got %+v", expectedURL, threadResult.ImageURLs)
 	}
 
-	if repo.created != threadResult {
+	if repo.created == nil {
 		t.Error("expected thread to be saved in repo")
+	}
+
+	if repo.created.ID != threadResult.ID {
+		t.Error("saved thread does not match returned thread")
 	}
 }
