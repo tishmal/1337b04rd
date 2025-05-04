@@ -1,39 +1,33 @@
 package unit
 
 import (
+	"1337b04rd/internal/adapter/postgres"
 	"1337b04rd/internal/domain/errors"
 	"context"
 	"fmt"
 	"testing"
-	"time"
+
+	"1337b04rd/internal/app/common/utils"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
-
-type ThreadInterface interface {
-	IsExpired() bool
-}
-
-type MockThreadRepository struct {
-	getSessionByIDFn func(sessionID string) (ThreadInterface, error)
-}
-
-func NewMockSessionRepository() *MockSessionRepository {
-	return &MockSessionRepository{}
-}
 
 func TestThreadRepository_LikeAdd(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
 	defer db.Close()
 
-	repo := &MockThreadRepository{db: db}
+	repo := &postgres.ThreadRepository{}
 
-	threadID := uuid.New()
-	sessionID := uuid.New()
-	now := time.Now()
+	threadID, err := utils.NewUUID()
+	if err != nil {
+		require.ErrorIs(t, err, errors.ErrInvalidThreadID)
+	}
+	sessionID, err := utils.NewUUID()
+	if err != nil {
+		require.ErrorIs(t, err, errors.ErrInvalidSessionID)
+	}
 
 	t.Run("successfully add like", func(t *testing.T) {
 		mock.ExpectQuery("SELECT EXISTS").
