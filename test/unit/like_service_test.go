@@ -1,71 +1,84 @@
 package unit
 
-// import (
-// 	"1337b04rd/internal/domain/errors"
-// 	"context"
-// 	"fmt"
-// 	"testing"
-// 	"time"
+import (
+	"1337b04rd/internal/domain/errors"
+	"context"
+	"fmt"
+	"testing"
+	"time"
 
-// 	"github.com/DATA-DOG/go-sqlmock"
-// 	"github.com/google/uuid"
-// )
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/require"
+)
 
-// func TestThreadRepository_LikeAdd(t *testing.T) {
-// 	db, mock, err := sqlmock.New()
-// 	require.NoError(t, err)
-// 	defer db.Close()
+type ThreadInterface interface {
+	IsExpired() bool
+}
 
-// 	repo := &ThreadRepository{db: db}
+type MockThreadRepository struct {
+	getSessionByIDFn func(sessionID string) (ThreadInterface, error)
+}
 
-// 	threadID := uuid.New()
-// 	sessionID := uuid.New()
-// 	now := time.Now()
+func NewMockSessionRepository() *MockSessionRepository {
+	return &MockSessionRepository{}
+}
 
-// 	t.Run("successfully add like", func(t *testing.T) {
-// 		mock.ExpectQuery("SELECT EXISTS").
-// 			WithArgs(threadID.String(), sessionID.String()).
-// 			WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(false))
+func TestThreadRepository_LikeAdd(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+	defer db.Close()
 
-// 		mock.ExpectBegin()
+	repo := &MockThreadRepository{db: db}
 
-// 		mock.ExpectExec("INSERT INTO thread_likes").
-// 			WithArgs(threadID, sessionID, sqlmock.AnyArg()).
-// 			WillReturnResult(sqlmock.NewResult(1, 1))
+	threadID := uuid.New()
+	sessionID := uuid.New()
+	now := time.Now()
 
-// 		mock.ExpectExec("UPDATE threads SET likes = likes").
-// 			WithArgs(threadID.String()).
-// 			WillReturnResult(sqlmock.NewResult(1, 1))
+	t.Run("successfully add like", func(t *testing.T) {
+		mock.ExpectQuery("SELECT EXISTS").
+			WithArgs(threadID.String(), sessionID.String()).
+			WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(false))
 
-// 		mock.ExpectCommit()
+		mock.ExpectBegin()
 
-// 		err := repo.LikeAdd(context.Background(), threadID, sessionID)
-// 		require.NoError(t, err)
-// 	})
+		mock.ExpectExec("INSERT INTO thread_likes").
+			WithArgs(threadID, sessionID, sqlmock.AnyArg()).
+			WillReturnResult(sqlmock.NewResult(1, 1))
 
-// 	t.Run("already liked", func(t *testing.T) {
-// 		mock.ExpectQuery("SELECT EXISTS").
-// 			WithArgs(threadID.String(), sessionID.String()).
-// 			WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(true))
+		mock.ExpectExec("UPDATE threads SET likes = likes").
+			WithArgs(threadID.String()).
+			WillReturnResult(sqlmock.NewResult(1, 1))
 
-// 		err := repo.LikeAdd(context.Background(), threadID, sessionID)
-// 		require.ErrorIs(t, err, errors.ErrAlreadyLiked)
-// 	})
+		mock.ExpectCommit()
 
-// 	t.Run("foreign key violation", func(t *testing.T) {
-// 		mock.ExpectQuery("SELECT EXISTS").
-// 			WithArgs(threadID.String(), sessionID.String()).
-// 			WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(false))
+		err := repo.LikeAdd(context.Background(), threadID, sessionID)
+		require.NoError(t, err)
+	})
 
-// 		mock.ExpectBegin()
+	t.Run("already liked", func(t *testing.T) {
+		mock.ExpectQuery("SELECT EXISTS").
+			WithArgs(threadID.String(), sessionID.String()).
+			WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(true))
 
-// 		mock.ExpectExec("INSERT INTO thread_likes").
-// 			WithArgs(threadID, sessionID, sqlmock.AnyArg()).
-// 			WillReturnError(fmt.Errorf("pq: insert or update on table violates foreign key"))
+		err := repo.LikeAdd(context.Background(), threadID, sessionID)
+		require.ErrorIs(t, err, errors.ErrAlreadyLiked)
+	})
 
-// 		mock.ExpectRollback()
+	t.Run("foreign key violation", func(t *testing.T) {
+		mock.ExpectQuery("SELECT EXISTS").
+			WithArgs(threadID.String(), sessionID.String()).
+			WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(false))
 
-// 		err := repo.LikeAdd(context.Background(), threadID, sessionID)
-// 		require.ErrorContains(t, err, "foreign key")
-// 	})
-// }
+		mock.ExpectBegin()
+
+		mock.ExpectExec("INSERT INTO thread_likes").
+			WithArgs(threadID, sessionID, sqlmock.AnyArg()).
+			WillReturnError(fmt.Errorf("pq: insert or update on table violates foreign key"))
+
+		mock.ExpectRollback()
+
+		err := repo.LikeAdd(context.Background(), threadID, sessionID)
+		require.ErrorContains(t, err, "foreign key")
+	})
+}
