@@ -2,7 +2,6 @@ package unit
 
 import (
 	"1337b04rd/internal/adapter/postgres"
-	"1337b04rd/internal/domain/errors"
 	"context"
 	"fmt"
 	"testing"
@@ -14,30 +13,26 @@ import (
 )
 
 func TestThreadRepository_LikeAdd(t *testing.T) {
-	db, mock, err := sqlmock.New()
-	require.NoError(t, err)
-	defer db.Close()
-
-	repo := &postgres.ThreadRepository{}
-
 	threadID, err := utils.NewUUID()
-	if err != nil {
-		require.ErrorIs(t, err, errors.ErrInvalidThreadID)
-	}
+	require.NoError(t, err)
+
 	sessionID, err := utils.NewUUID()
-	if err != nil {
-		require.ErrorIs(t, err, errors.ErrInvalidSessionID)
-	}
+	require.NoError(t, err)
 
 	t.Run("successfully add like", func(t *testing.T) {
+		db, mock, err := sqlmock.New()
+		require.NoError(t, err)
+		defer db.Close()
+
+		repo := postgres.NewThreadRepository(db)
+
 		mock.ExpectQuery("SELECT EXISTS").
 			WithArgs(threadID.String(), sessionID.String()).
 			WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(false))
 
 		mock.ExpectBegin()
-
 		mock.ExpectExec("INSERT INTO thread_likes").
-			WithArgs(threadID, sessionID, sqlmock.AnyArg()).
+			WithArgs(threadID.String(), sessionID.String(), sqlmock.AnyArg()).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		mock.ExpectExec("UPDATE threads SET likes = likes").
@@ -46,33 +41,51 @@ func TestThreadRepository_LikeAdd(t *testing.T) {
 
 		mock.ExpectCommit()
 
-		err := repo.LikeAdd(context.Background(), threadID, sessionID)
+		err = repo.LikeAdd(context.Background(), threadID, sessionID)
 		require.NoError(t, err)
 	})
 
-	t.Run("already liked", func(t *testing.T) {
+	t.Run("already liked (acts as unlike)", func(t *testing.T) {
+		db, mock, err := sqlmock.New()
+		require.NoError(t, err)
+		defer db.Close()
+
+		repo := postgres.NewThreadRepository(db)
+
 		mock.ExpectQuery("SELECT EXISTS").
 			WithArgs(threadID.String(), sessionID.String()).
 			WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(true))
 
-		err := repo.LikeAdd(context.Background(), threadID, sessionID)
-		require.ErrorIs(t, err, errors.ErrAlreadyLiked)
+		mock.ExpectExec("DELETE FROM thread_likes").
+			WithArgs(threadID.String(), sessionID.String()).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		mock.ExpectExec("UPDATE threads SET likes = likes").
+			WithArgs(threadID.String()).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		err = repo.LikeAdd(context.Background(), threadID, sessionID)
+		require.NoError(t, err)
 	})
 
 	t.Run("foreign key violation", func(t *testing.T) {
+		db, mock, err := sqlmock.New()
+		require.NoError(t, err)
+		defer db.Close()
+
+		repo := postgres.NewThreadRepository(db)
+
 		mock.ExpectQuery("SELECT EXISTS").
 			WithArgs(threadID.String(), sessionID.String()).
 			WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(false))
 
 		mock.ExpectBegin()
-
 		mock.ExpectExec("INSERT INTO thread_likes").
-			WithArgs(threadID, sessionID, sqlmock.AnyArg()).
+			WithArgs(threadID.String(), sessionID.String(), sqlmock.AnyArg()).
 			WillReturnError(fmt.Errorf("pq: insert or update on table violates foreign key"))
-
 		mock.ExpectRollback()
 
-		err := repo.LikeAdd(context.Background(), threadID, sessionID)
+		err = repo.LikeAdd(context.Background(), threadID, sessionID)
 		require.ErrorContains(t, err, "foreign key")
 	})
 }
