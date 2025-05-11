@@ -3,6 +3,7 @@ package services
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -11,6 +12,7 @@ import (
 
 	"1337b04rd/internal/app/common/logger"
 	"1337b04rd/internal/app/ports"
+	er "1337b04rd/internal/domain/errors"
 	"1337b04rd/internal/domain/thread"
 
 	uuidHelper "1337b04rd/internal/app/common/utils"
@@ -210,6 +212,16 @@ func (s *ThreadService) LikeAdd(ctx context.Context, threadID, sessionID uuidHel
 
 	err := s.threadRepo.LikeAdd(ctx, threadID, sessionID)
 	if err != nil {
+		// Если уже лайкнул — не считаем за ошибку, просто возвращаем текущее кол-во лайков
+		if errors.Is(err, er.ErrAlreadyLiked) {
+			likes, countErr := s.threadRepo.GetCountLikes(ctx, threadID)
+			if countErr != nil {
+				logger.Error("failed to get likes after already liked", "error", countErr)
+				return 0, countErr
+			}
+			return likes, nil
+		}
+
 		logger.Error("failed to add like to thread", "error", err)
 		return 0, err
 	}
@@ -220,6 +232,5 @@ func (s *ThreadService) LikeAdd(ctx context.Context, threadID, sessionID uuidHel
 		return 0, err
 	}
 
-	// logger.Info("Added success ❤️", "likes", likes, "thread_id", threadID, "session_id", sessionID)
 	return likes, nil
 }

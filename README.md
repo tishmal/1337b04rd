@@ -130,7 +130,7 @@ psql -h localhost -U your_db_user -d your_db_password
 ## 📑 Tests
 
 ```bash
-go test ./...
+go test -coverpkg=./internal/... ./test/unit/...
 ```
 
 

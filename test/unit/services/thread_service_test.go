@@ -1,4 +1,4 @@
-package unit
+package services
 
 import (
 	"bytes"
@@ -8,12 +8,14 @@ import (
 
 	uuidHelper "1337b04rd/internal/app/common/utils"
 	"1337b04rd/internal/app/services"
+
 	"1337b04rd/internal/domain/thread"
 )
 
 type mockThreadRepo struct {
-	created *thread.Thread
-	err     error
+	GetThreadByIDFunc func(ctx context.Context, id uuidHelper.UUID) (*thread.Thread, error)
+	created           *thread.Thread
+	err               error
 }
 
 func (m *mockThreadRepo) CreateThread(ctx context.Context, t *thread.Thread) error {
@@ -23,6 +25,9 @@ func (m *mockThreadRepo) CreateThread(ctx context.Context, t *thread.Thread) err
 
 // Заглушки
 func (m *mockThreadRepo) GetThreadByID(ctx context.Context, id uuidHelper.UUID) (*thread.Thread, error) {
+	if m.GetThreadByIDFunc != nil {
+		return m.GetThreadByIDFunc(ctx, id)
+	}
 	return nil, nil
 }
 func (m *mockThreadRepo) UpdateThread(ctx context.Context, t *thread.Thread) error {
@@ -102,5 +107,41 @@ func TestCreateThread_Success(t *testing.T) {
 
 	if repo.created.ID != threadResult.ID {
 		t.Error("saved thread does not match returned thread")
+	}
+}
+
+func TestGetThreadByID_Success(t *testing.T) {
+	expectedID, _ := uuidHelper.ParseUUID("123e4567e89b12d3a456426614174001")
+	mockThread := &thread.Thread{
+		ID:        expectedID,
+		Title:     "Test Title",
+		Content:   "Test Content",
+		ImageURLs: []string{"http://minio:9000/thread/image1.jpg"},
+	}
+
+	repo := &mockThreadRepo{
+		GetThreadByIDFunc: func(ctx context.Context, id uuidHelper.UUID) (*thread.Thread, error) {
+			if id != expectedID {
+				t.Errorf("expected ID %s, got %s", expectedID, id)
+			}
+			return mockThread, nil
+		},
+	}
+	s3 := &mockS3{}
+	svc := services.NewThreadService(repo, s3)
+
+	result, err := svc.GetThreadByID(context.TODO(), expectedID)
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+	if result == nil {
+		t.Fatal("expected thread, got nil")
+	}
+	if result.ID != expectedID {
+		t.Errorf("expected ID %s, got %s", expectedID, result.ID)
+	}
+	expectedURL := "http://localhost:9000/thread/image1.jpg"
+	if result.ImageURLs[0] != expectedURL {
+		t.Errorf("expected image URL '%s', got '%s'", expectedURL, result.ImageURLs[0])
 	}
 }

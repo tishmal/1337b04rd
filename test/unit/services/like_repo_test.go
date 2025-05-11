@@ -1,4 +1,4 @@
-package unit
+package services
 
 import (
 	"1337b04rd/internal/adapter/postgres"
